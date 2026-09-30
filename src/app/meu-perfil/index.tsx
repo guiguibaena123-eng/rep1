@@ -24,6 +24,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, LoadingScreen, ProgressBar, ScoreRing, Text, useToast } from '@/components';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useFollowCounts } from '@/features/explore/api';
+import { FollowStats } from '@/features/explore/components';
 import { useLinkedInReports } from '@/features/linkedin/api';
 import { useProfile, useStrengths, useUpdateProfile } from '@/features/profile/api';
 import { Avatar } from '@/features/profile/Avatar';
@@ -60,6 +62,7 @@ export default function MyProfileScreen() {
   const insets = useSafeAreaInsets();
   const profile = useProfile();
   const userId = useAuth().session?.user.id;
+  const counts = useFollowCounts(userId).data;
 
   if (profile.isPending) return <LoadingScreen />;
   if (!profile.data) {
@@ -84,11 +87,24 @@ export default function MyProfileScreen() {
               </Text>
               {verified && <VerifiedBadge kind={verified} size={24} />}
             </View>
+            {!!d.username && (
+              <Text variant="bodySmall" color="textSecondary">
+                {`@${d.username}`}
+              </Text>
+            )}
             {!!d.headline && <Text>{d.headline}</Text>}
             <View style={styles.meta}>
               {!!d.city && <Meta icon={MapPin} label={d.city} />}
               {d.availability.length > 0 && <Meta icon={Clock} label={availabilityLabel(d.availability)} />}
             </View>
+            {!!userId && !!counts && (
+              <FollowStats
+                id={userId}
+                followers={counts.followers}
+                following={counts.following}
+                title={d.username ? `@${d.username}` : (d.name ?? '')}
+              />
+            )}
           </View>
           <SocialTabs linkedin={d.linkedin_url} instagram={profile.data.instagram} />
         </View>
@@ -264,7 +280,7 @@ function SocialTabs({ linkedin, instagram }: { linkedin: string | null; instagra
           </Text>
         </Pressable>
       )}
-      {handle && (
+      {!!handle && (
         <Pressable
           onPress={() => open(instagramHref(handle))}
           accessibilityRole="link"
@@ -320,7 +336,7 @@ function Section({
           <Text variant="bodySmall" color="textSecondary">
             {emptyText}
           </Text>
-          {addLabel && <Button label={addLabel} variant="text" onPress={edit} style={styles.inlineAction} />}
+          {!!addLabel && <Button label={addLabel} variant="text" onPress={edit} style={styles.inlineAction} />}
         </View>
       ) : (
         children

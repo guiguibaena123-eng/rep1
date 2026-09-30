@@ -98,12 +98,12 @@ export function BottomSheet({
           )}
           <ScrollView bounces={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
             {icon}
-            {title && (
+            {!!title && (
               <Text accessibilityRole="header" style={[styles.title, centerText && styles.centerText]}>
                 {title}
               </Text>
             )}
-            {description && (
+            {!!description && (
               <Text color="textSecondary" style={centerText && styles.centerText}>
                 {description}
               </Text>

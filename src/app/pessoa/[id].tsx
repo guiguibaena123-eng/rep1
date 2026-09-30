@@ -23,7 +23,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomSheet, Button, Card, EmptyState, Input, LoadingScreen, Screen, ScreenHeader, Text, useToast } from '@/components';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { errorCode, useBlock, usePublicProfile, useReport } from '@/features/explore/api';
-import { FollowButton } from '@/features/explore/components';
+import { FollowButton, FollowStats } from '@/features/explore/components';
 import { DETAIL_MAX, REPORT_REASONS, type PublicProfile, type ReportReason } from '@/features/explore/types';
 import { Avatar } from '@/features/profile/Avatar';
 import { CoverImage } from '@/features/profile/CoverImage';
@@ -147,6 +147,11 @@ function PersonView({ person }: { person: PublicProfile }) {
               <Text accessibilityRole="header" style={styles.name}>
                 {person.name}
               </Text>
+              {!!person.username && (
+                <Text variant="bodySmall" color="textSecondary">
+                  {`@${person.username}`}
+                </Text>
+              )}
               {!!person.headline && <Text>{person.headline}</Text>}
               <View style={styles.meta}>
                 {!!person.city && (
@@ -157,19 +162,13 @@ function PersonView({ person }: { person: PublicProfile }) {
                     </Text>
                   </View>
                 )}
-                <Text variant="bodySmall" color="textSecondary">
-                  <Text variant="bodySmall" weight="semibold">
-                    {String(person.followers)}
-                  </Text>
-                  {` ${x.followersLabel(person.followers)}`}
-                </Text>
-                <Text variant="bodySmall" color="textSecondary">
-                  <Text variant="bodySmall" weight="semibold">
-                    {String(person.following)}
-                  </Text>
-                  {` ${x.followingLabel}`}
-                </Text>
               </View>
+              <FollowStats
+                id={person.id}
+                followers={person.followers}
+                following={person.following}
+                title={person.username ? `@${person.username}` : (person.name ?? '')}
+              />
             </View>
           </View>
 

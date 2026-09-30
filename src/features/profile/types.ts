@@ -37,6 +37,8 @@ export type Profile = {
   id: string;
   created_at: string;
   name: string | null;
+  /** Nome de usuário (@), sem o @. Gerado a partir do nome; a pessoa pode trocar na T19. */
+  username: string | null;
   age: number | null;
   goal: Goal | null;
   area: Area | null;
@@ -82,6 +84,7 @@ export const DETAIL_FIELDS = [
   'cover_x',
   'cover_y',
   'name',
+  'username',
   'headline',
   'city',
   'bio',

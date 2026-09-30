@@ -28,12 +28,12 @@ export function EmptyState({ icon: Icon, title, text, actionLabel, onAction, act
       <Text variant="sectionTitle" align="center" accessibilityRole="header">
         {title}
       </Text>
-      {text && (
+      {!!text && (
         <Text variant="bodySmall" color="textSecondary" align="center">
           {text}
         </Text>
       )}
-      {actionLabel && onAction && (
+      {!!actionLabel && onAction && (
         <Button
           label={actionLabel}
           onPress={onAction}

@@ -9,9 +9,11 @@ import {
   highlightSkills,
   instagramHandle,
   isValidLink,
+  normalizeUsername,
   removeSkill,
   skillSuggestions,
   SKILLS_MAX,
+  usernameProblem,
   validateDetails,
 } from '../details';
 import type { ProfileDetails, Skill } from '../types';
@@ -22,6 +24,7 @@ const empty: ProfileDetails = {
   cover_x: 50,
   cover_y: 50,
   name: 'Ana Souza',
+  username: 'ana.souza',
   headline: '',
   city: '',
   bio: '',
@@ -37,6 +40,7 @@ const empty: ProfileDetails = {
   linkedin_url: '',
   portfolio_url: '',
   instagram: '',
+  is_public: false,
 };
 
 const full: ProfileDetails = {
@@ -242,5 +246,49 @@ describe('hasChanges (descartar alterações)', () => {
     expect(hasChanges(full, edited)).toBe(true);
     const discarded = { ...full };
     expect(hasChanges(full, discarded)).toBe(false);
+  });
+});
+
+describe('nome de usuário (@)', () => {
+  it('normaliza o que a pessoa digitou: sem @, sem espaços e em minúsculas', () => {
+    expect(normalizeUsername('  @Ana.Souza ')).toBe('ana.souza');
+    expect(normalizeUsername('@@bia_1')).toBe('bia_1');
+    expect(normalizeUsername(null)).toBe('');
+  });
+
+  it.each([
+    ['', 'empty'],
+    ['@', 'empty'],
+    ['ab', 'short'],
+    ['a'.repeat(21), 'long'],
+    ['ana souza!', 'chars'],
+    ['joão', 'chars'],
+    ['.ana', 'edges'],
+    ['ana_', 'edges'],
+    ['ana..souza', 'dots'],
+    ['admin', 'reserved'],
+    ['Siwki', 'reserved'],
+  ])('"%s" → %s', (value, problem) => {
+    expect(usernameProblem(value)).toBe(problem);
+  });
+
+  it.each(['ana', 'ana.souza', 'bia_2026', '@Ana.Souza', 'a'.repeat(20)])('"%s" está certo', (value) => {
+    expect(usernameProblem(value)).toBeNull();
+  });
+
+  it('validação mostra a mensagem do @', () => {
+    expect(validateDetails({ ...empty, username: '' }).username).toBe(t.editProfile.usernameEmpty);
+    expect(validateDetails({ ...empty, username: 'ana..s' }).username).toBe(t.editProfile.usernameDots);
+    expect(validateDetails({ ...empty, username: '@Ana.Souza' }).username).toBeUndefined();
+  });
+
+  it('salva normalizado; vazio vira null (o banco gera um @ pelo nome)', () => {
+    expect(detailsToUpdate({ ...empty, username: ' @Ana.Souza ' }).username).toBe('ana.souza');
+    expect(detailsToUpdate({ ...empty, username: '  ' }).username).toBeNull();
+  });
+
+  it('trocar só maiúsculas ou o @ do começo não conta como mudança', () => {
+    expect(hasChanges(empty, { ...empty, username: '@ANA.SOUZA' })).toBe(false);
+    expect(hasChanges(empty, { ...empty, username: 'ana.souza2' })).toBe(true);
   });
 });

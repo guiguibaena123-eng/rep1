@@ -50,6 +50,11 @@ export default function ProfileTab() {
             </Text>
             {verified && <VerifiedBadge kind={verified} />}
           </View>
+          {!!profile?.username && (
+            <Text variant="bodySmall" color="textSecondary" numberOfLines={1}>
+              {`@${profile.username}`}
+            </Text>
+          )}
           <Text variant="bodySmall" color="textSecondary" numberOfLines={1}>
             {session?.user.email}
           </Text>
@@ -80,7 +85,8 @@ export default function ProfileTab() {
           title={p.myProfile}
           subtitle={pct === null ? undefined : p.myProfileText(pct)}
           onPress={() => router.push('/meu-perfil')}
-        />      </Group>
+        />
+      </Group>
     </Screen>
   );
 }

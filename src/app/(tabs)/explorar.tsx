@@ -148,7 +148,7 @@ export default function ExploreTab() {
             <Text variant="sectionTitle" accessibilityRole="header">
               {x.similarTitle}
             </Text>
-            {similarText && (
+            {!!similarText && (
               <Text variant="bodySmall" color="textSecondary">
                 {similarText}
               </Text>

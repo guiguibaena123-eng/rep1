@@ -58,7 +58,7 @@ function Report({ row }: { row: LinkedInReportRow }) {
           <Text color="textSecondary" align="center">
             {report.summary}
           </Text>
-          {row.target_role && (
+          {!!row.target_role && (
             <Text variant="caption" color="textSecondary" align="center">
               {r.role(row.target_role)}
             </Text>
@@ -211,12 +211,12 @@ function FullDetails({ row, report }: { row: LinkedInReportRow; report: FullRepo
                       </Text>
                     </Text>
                   ))}
-                  {(s.before || s.after) && (
+                  {!!(s.before || s.after) && (
                     <View style={{ gap: space[2] }}>
                       <Text variant="caption" weight="semibold" color="textSecondary">
                         {r.beforeAfter}
                       </Text>
-                      {s.before && (
+                      {!!s.before && (
                         <View style={[styles.quote, { backgroundColor: colors.background }]}>
                           <Text variant="bodySmall" color="textSecondary">
                             <Text variant="bodySmall" weight="semibold">
@@ -226,7 +226,7 @@ function FullDetails({ row, report }: { row: LinkedInReportRow; report: FullRepo
                           </Text>
                         </View>
                       )}
-                      {s.after && (
+                      {!!s.after && (
                         <View style={[styles.quote, { backgroundColor: colors.primarySoft }]}>
                           <Text variant="bodySmall">
                             <Text variant="bodySmall" weight="semibold" color="primaryInk">
@@ -238,7 +238,7 @@ function FullDetails({ row, report }: { row: LinkedInReportRow; report: FullRepo
                       )}
                     </View>
                   )}
-                  {copyText && (
+                  {!!copyText && (
                     <CopyButton
                       label={copied === `s${i}` ? t.common.copied : r.copySuggestion}
                       onPress={() => copy(`s${i}`, copyText)}
@@ -281,7 +281,7 @@ function FullDetails({ row, report }: { row: LinkedInReportRow; report: FullRepo
         </View>
       )}
 
-      {report.about_suggestion && (
+      {!!report.about_suggestion && (
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, gap: space[3] }]}>
           <Text variant="sectionTitle" accessibilityRole="header">
             {r.about}

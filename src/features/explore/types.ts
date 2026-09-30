@@ -4,6 +4,7 @@ import type { Area, Availability, Course, Education, Experience, Goal, Skill, Wo
 export type ExplorePerson = {
   id: string;
   name: string | null;
+  username: string | null;
   headline: string | null;
   city: string | null;
   area: Area | null;
@@ -17,6 +18,7 @@ export type ExplorePerson = {
 export type PublicProfile = {
   id: string;
   name: string | null;
+  username: string | null;
   headline: string | null;
   city: string | null;
   bio: string | null;
@@ -50,3 +52,8 @@ export type ExploreFilter = 'area' | 'goal' | 'near' | 'estagio' | 'jovem_aprend
 
 export const EXPLORE_PAGE_SIZE = 20;
 export const DETAIL_MAX = 500;
+
+/** Listas de conexões de um perfil. */
+export const FOLLOW_KINDS = ['followers', 'following'] as const;
+export type FollowKind = (typeof FOLLOW_KINDS)[number];
+export type FollowCounts = { followers: number; following: number };

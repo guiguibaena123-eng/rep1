@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomSheet, Button, Card, Chip, Input, LoadingScreen, Text, useToast } from '@/components';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { isOffline, useProfile, useSaveDetails, useSuggestBio } from '@/features/profile/api';
+import { checkUsername, isOffline, UsernameTakenError, useProfile, useSaveDetails, useSuggestBio } from '@/features/profile/api';
 import { Avatar } from '@/features/profile/Avatar';
 import {
   addSkill,
@@ -30,9 +30,12 @@ import {
   HEADLINE_MAX,
   LINK_MAX,
   NAME_MAX,
+  normalizeUsername,
   removeSkill,
   SKILL_NAME_MAX,
   skillSuggestions,
+  USERNAME_MAX,
+  usernameProblem,
   validateDetails,
 } from '@/features/profile/details';
 import { CourseSheet, EducationSheet, ExperienceSheet, LanguageSheet } from '@/features/profile/EditSheets';
@@ -69,6 +72,10 @@ import { fonts, iconStroke, radius, screenPadding, size, space } from '@/theme/t
 const e = t.editProfile;
 const m = t.myProfile;
 const PHOTO = 88;
+const USERNAME_CHECK_MS = 400;
+
+/** Situação do @ digitado: conferindo, livre ou já usado por outra pessoa. */
+type UsernameStatus = 'checking' | 'free' | 'taken' | null;
 
 /** Lista em edição num sheet: index null = item novo ("+ Adicionar"). */
 type ListKey = 'experiences' | 'education' | 'courses' | 'languages';
@@ -112,7 +119,33 @@ function EditForm({ profile }: { profile: Profile }) {
   const [open, setOpen] = useState<OpenSheet>(null);
 
   const set = (patch: Partial<ProfileDetails>) => setForm((f) => ({ ...f, ...patch }));
-  const errors = tried ? validateDetails(form) : {};
+
+  // ---------- @ (nome de usuário) ----------
+  // Confere se está livre enquanto a pessoa digita (só quando mudou e o formato está certo).
+  // Último resultado do servidor para um @ (free null = não deu para conferir, ex.: sem internet).
+  const [checked, setChecked] = useState<{ username: string; free: boolean | null } | null>(null);
+  const username = normalizeUsername(form.username);
+  const shouldCheck = username !== normalizeUsername(initial.username) && !usernameProblem(username);
+  let usernameStatus: UsernameStatus = null;
+  if (shouldCheck) {
+    if (checked?.username !== username) usernameStatus = 'checking';
+    else if (checked.free !== null) usernameStatus = checked.free ? 'free' : 'taken';
+  }
+  useEffect(() => {
+    if (!shouldCheck) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const free = await checkUsername(username);
+      if (!cancelled) setChecked({ username, free });
+    }, USERNAME_CHECK_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [username, shouldCheck]);
+
+  const formErrors = tried ? validateDetails(form) : {};
+  const errors = usernameStatus === 'taken' && !formErrors.username ? { ...formErrors, username: e.usernameTaken } : formErrors;
   const changed = hasChanges(initial, form);
 
   // Sai da tela. Foto ou capa enviada nesta edição e não salva: apaga do servidor.
@@ -258,7 +291,7 @@ function EditForm({ profile }: { profile: Profile }) {
 
   const save = () => {
     setTried(true);
-    if (Object.keys(validateDetails(form)).length > 0) {
+    if (Object.keys(validateDetails(form)).length > 0 || usernameStatus === 'taken') {
       toast.show(e.fixErrors, 'error');
       return;
     }
@@ -272,7 +305,12 @@ function EditForm({ profile }: { profile: Profile }) {
         toast.show(mode === 'online' ? e.saved : e.savedOffline, 'success');
         router.back();
       },
-      onError: () => toast.show(e.saveError, 'error'),
+      onError: (err) => {
+        if (err instanceof UsernameTakenError) {
+          setChecked({ username, free: false });
+          toast.show(e.usernameTaken, 'error');
+        } else toast.show(e.saveError, 'error');
+      },
     });
   };
 
@@ -366,6 +404,34 @@ function EditForm({ profile }: { profile: Profile }) {
             autoCapitalize="words"
             error={errors.name}
           />
+          <View style={{ gap: 6 }}>
+            <Input
+              label={e.username}
+              value={form.username ?? ''}
+              onChangeText={(value) => set({ username: value })}
+              maxLength={USERNAME_MAX + 1}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="username"
+              textContentType="username"
+              accessibilityHint={e.usernameHint}
+              error={errors.username}
+            />
+            {!errors.username && (
+              <Text
+                variant="caption"
+                color={usernameStatus === 'free' ? 'successInk' : 'textSecondary'}
+                style={{ fontFamily: fonts.body400 }}
+                accessibilityLiveRegion="polite"
+              >
+                {usernameStatus === 'checking'
+                  ? e.usernameChecking
+                  : usernameStatus === 'free'
+                    ? e.usernameFree(username)
+                    : e.usernameHint}
+              </Text>
+            )}
+          </View>
           <View style={{ gap: 6 }}>
             <Input
               label={e.headline}
@@ -720,7 +786,7 @@ function EditForm({ profile }: { profile: Profile }) {
         />
       </BottomSheet>
 
-      {adjusting && form.cover_path && (
+      {adjusting && !!form.cover_path && (
         <CoverPositionEditor
           path={form.cover_path}
           localUri={localImage.cover}

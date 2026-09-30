@@ -52,7 +52,8 @@ export function exploreParams(
   if (selected.includes('estagio')) goals.add('estagio');
   if (selected.includes('jovem_aprendiz')) goals.add('jovem_aprendiz');
   const area = selected.includes('area') && profile?.area && profile.area !== 'outra' ? profile.area : null;
-  const queryAreas = q ? areasMatching(q) : [];
+  // "@ana" procura só pelo @ (o banco trata); sem @, a busca também acha áreas pelo nome.
+  const queryAreas = q && !q.startsWith('@') ? areasMatching(q) : [];
   return {
     p_query: q || null,
     p_query_areas: queryAreas.length > 0 ? queryAreas : null,

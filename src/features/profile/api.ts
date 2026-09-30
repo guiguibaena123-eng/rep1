@@ -70,12 +70,26 @@ export function useSaveDetails() {
         return 'offline';
       }
       const { data, error } = await supabase.from('profiles').update(changes).eq('id', userId!).select('*').single();
-      if (error) throw error;
+      if (error) throw isUsernameTaken(error) ? new UsernameTakenError() : error;
       await clearPending(userId!);
       queryClient.setQueryData(profileKey(userId), data as Profile);
       return 'online';
     },
   });
+}
+
+/** Outra pessoa já usa esse @ (o banco recusou por ser repetido). */
+export class UsernameTakenError extends Error {}
+
+function isUsernameTaken(error: { code?: string; message?: string }) {
+  return error.code === '23505' && (error.message ?? '').includes('username');
+}
+
+/** "Esse @ está livre?" (null enquanto não dá para saber, ex.: sem internet). */
+export async function checkUsername(username: string): Promise<boolean | null> {
+  const { data, error } = await supabase.rpc('username_available', { p_username: username });
+  if (error) return null;
+  return data === true;
 }
 
 /** Envia a edição guardada sem internet assim que a conexão voltar (montado no layout raiz). */
@@ -89,9 +103,15 @@ export function useProfileSync() {
     if (!userId || !online) return;
     let cancelled = false;
     (async () => {
-      const pending = await readPending(userId);
+      let pending: Partial<ProfileDetails> | null = await readPending(userId);
       if (!pending || cancelled) return;
-      const { data, error } = await supabase.from('profiles').update(pending).eq('id', userId).select('*').single();
+      let { data, error } = await supabase.from('profiles').update(pending).eq('id', userId).select('*').single();
+      // Alguém pegou o @ enquanto a pessoa estava sem internet: salva o resto e mantém o @ antigo.
+      if (error && isUsernameTaken(error) && !cancelled) {
+        const { username: _taken, ...rest } = pending;
+        pending = rest;
+        ({ data, error } = await supabase.from('profiles').update(pending).eq('id', userId).select('*').single());
+      }
       if (error || cancelled) return; // tenta de novo na próxima vez que a conexão mudar
       await clearPending(userId);
       queryClient.setQueryData(profileKey(userId), data as Profile);

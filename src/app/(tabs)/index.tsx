@@ -168,7 +168,7 @@ export default function HomeTab() {
             </Text>
             <Text variant="cardTitle" accessibilityRole="header">{`${t.options.area[area]} · ${t.levels[level]}`}</Text>
             {/* O "próximo passo" do último feedback deixa o treino de hoje com a cara da pessoa (T5). */}
-            {!isNew && nextStep && <Text variant="bodySmall">{h.todayNext(nextStep)}</Text>}
+            {!isNew && !!nextStep && <Text variant="bodySmall">{h.todayNext(nextStep)}</Text>}
             <Text variant="bodySmall" color="textOnSoft">
               {isNew ? h.todayFirst(DEFAULT_QUESTION_COUNT, TODAY_MINUTES) : h.todayHint(DEFAULT_QUESTION_COUNT, TODAY_MINUTES)}
             </Text>

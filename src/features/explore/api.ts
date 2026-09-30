@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { supabase } from '@/lib/supabase';
 
 import { applyFollow, nextOffset, type ExploreParams } from './logic';
-import { EXPLORE_PAGE_SIZE, type ExplorePerson, type PublicProfile, type ReportReason } from './types';
+import { EXPLORE_PAGE_SIZE, type ExplorePerson, type FollowCounts, type FollowKind, type PublicProfile, type ReportReason } from './types';
 
 /** Todas as chaves do Explorar começam com 'explore': invalidar essa raiz recarrega tudo. */
 export const exploreKeys = {
@@ -12,6 +12,8 @@ export const exploreKeys = {
   list: (userId: string | undefined, params: ExploreParams) => ['explore', 'list', userId, params] as const,
   similar: (userId: string | undefined) => ['explore', 'similar', userId] as const,
   profile: (userId: string | undefined, id: string) => ['explore', 'profile', userId, id] as const,
+  counts: (userId: string | undefined, id: string) => ['explore', 'counts', userId, id] as const,
+  follows: (userId: string | undefined, id: string, kind: FollowKind) => ['explore', 'follows', userId, id, kind] as const,
 };
 
 /** Código do erro que as funções do banco devolvem (PROFILE_UNAVAILABLE = P0002, LIMIT_REACHED = 54000). */
@@ -88,6 +90,43 @@ export function useFollow() {
     onError: (_err, _vars, ctx) => {
       ctx?.before.forEach(([key, data]) => queryClient.setQueryData(key, data));
     },
+    // Os números ("Seguindo" do próprio perfil e "Seguidores" de quem foi seguido) vêm do banco.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['explore', 'counts'] }),
+  });
+}
+
+/** Seguidores e seguindo de um perfil (o próprio ou um visível). null = não dá para ver. */
+export function useFollowCounts(id: string | undefined) {
+  const userId = useAuth().session?.user.id;
+  return useQuery({
+    queryKey: exploreKeys.counts(userId, id ?? ''),
+    enabled: !!userId && !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('follow_counts', { p_id: id });
+      if (error) throw error;
+      return ((data as FollowCounts[] | null)?.[0] ?? null) as FollowCounts | null;
+    },
+  });
+}
+
+/** Lista "Seguidores" ou "Seguindo": 20 por página, só perfis que a pessoa logada pode ver. */
+export function useFollowList(id: string, kind: FollowKind) {
+  const userId = useAuth().session?.user.id;
+  return useInfiniteQuery({
+    queryKey: exploreKeys.follows(userId, id, kind),
+    enabled: !!userId && !!id,
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      const { data, error } = await supabase.rpc('follow_list', {
+        p_id: id,
+        p_kind: kind,
+        p_limit: EXPLORE_PAGE_SIZE,
+        p_offset: pageParam,
+      });
+      if (error) throw error;
+      return (data ?? []) as ExplorePerson[];
+    },
+    getNextPageParam: (last, all) => nextOffset(last, all, EXPLORE_PAGE_SIZE),
   });
 }
 

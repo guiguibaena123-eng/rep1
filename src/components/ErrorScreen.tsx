@@ -42,7 +42,7 @@ export function ErrorScreen({
               icon={<RefreshCw size={18} color={colors.onPrimary} strokeWidth={2} />}
             />
           )}
-          {secondaryLabel && onSecondary && <Button label={secondaryLabel} variant="text" onPress={onSecondary} />}
+          {!!secondaryLabel && onSecondary && <Button label={secondaryLabel} variant="text" onPress={onSecondary} />}
         </>
       }
     >

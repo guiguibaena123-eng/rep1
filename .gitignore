@@ -48,3 +48,4 @@ example
 
 # configuracoes locais do Claude Code
 .claude/
+graphify-out/

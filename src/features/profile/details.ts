@@ -89,10 +89,62 @@ export function instagramHref(handle: string) {
   return `https://instagram.com/${handle}`;
 }
 
+// ---------- Nome de usuário (@) ----------
+
+export const USERNAME_MIN = 3;
+export const USERNAME_MAX = 20;
+/** Mesma regra do banco (profiles_username_format). */
+const USERNAME_RE = /^[a-z0-9][a-z0-9._]{1,18}[a-z0-9]$/;
+/** Mesma lista do banco (username_reserved). */
+const USERNAME_RESERVED = new Set([
+  'admin', 'administrador', 'siwki', 'pronto', 'suporte', 'support', 'ajuda', 'help',
+  'moderacao', 'moderador', 'oficial', 'official', 'equipe', 'team', 'root', 'sistema',
+]);
+
+/** Como a pessoa digitou → como fica salvo: sem @, sem espaços e em minúsculas. */
+export function normalizeUsername(value: string | null | undefined) {
+  return (value ?? '').trim().replace(/^@+/, '').replace(/\s+/g, '').toLowerCase();
+}
+
+export type UsernameProblem = 'empty' | 'short' | 'long' | 'chars' | 'edges' | 'dots' | 'reserved';
+
+/** O que está errado no @ (null = formato certo; se está livre, só o servidor sabe). */
+export function usernameProblem(value: string | null | undefined): UsernameProblem | null {
+  const u = normalizeUsername(value);
+  if (!u) return 'empty';
+  if (u.length < USERNAME_MIN) return 'short';
+  if (u.length > USERNAME_MAX) return 'long';
+  if (!/^[a-z0-9._]+$/.test(u)) return 'chars';
+  if (!USERNAME_RE.test(u)) return 'edges';
+  if (u.includes('..')) return 'dots';
+  if (USERNAME_RESERVED.has(u)) return 'reserved';
+  return null;
+}
+
+export function usernameMessage(problem: UsernameProblem) {
+  const e = t.editProfile;
+  switch (problem) {
+    case 'empty':
+      return e.usernameEmpty;
+    case 'short':
+      return e.usernameShort(USERNAME_MIN);
+    case 'long':
+      return e.tooLong(USERNAME_MAX);
+    case 'chars':
+      return e.usernameChars;
+    case 'edges':
+      return e.usernameEdges;
+    case 'dots':
+      return e.usernameDots;
+    case 'reserved':
+      return e.usernameTaken;
+  }
+}
+
 // ---------- Validação da T19 ----------
 
 export type FieldErrors = Partial<
-  Record<'name' | 'headline' | 'city' | 'bio' | 'linkedin_url' | 'portfolio_url' | 'instagram', string>
+  Record<'name' | 'username' | 'headline' | 'city' | 'bio' | 'linkedin_url' | 'portfolio_url' | 'instagram', string>
 >;
 
 export function validateDetails(d: ProfileDetails): FieldErrors {
@@ -103,6 +155,9 @@ export function validateDetails(d: ProfileDetails): FieldErrors {
   if (!name) errors.name = e.nameEmpty;
   else if (name.length < NAME_MIN) errors.name = e.nameShort;
   else if (name.length > NAME_MAX) errors.name = e.tooLong(NAME_MAX);
+
+  const username = usernameProblem(d.username);
+  if (username) errors.username = usernameMessage(username);
 
   if ((d.headline ?? '').trim().length > HEADLINE_MAX) errors.headline = e.tooLong(HEADLINE_MAX);
   if ((d.city ?? '').trim().length > CITY_MAX) errors.city = e.tooLong(CITY_MAX);
@@ -197,6 +252,7 @@ export function detailsFromProfile(p: Profile): ProfileDetails {
     cover_x: p.cover_x ?? 50,
     cover_y: p.cover_y ?? 50,
     name: p.name ?? '',
+    username: p.username ?? '',
     headline: p.headline ?? '',
     city: p.city ?? '',
     bio: p.bio ?? '',
@@ -222,6 +278,8 @@ export function detailsToUpdate(d: ProfileDetails): ProfileDetails {
   return {
     ...d,
     name: (d.name ?? '').trim(),
+    // Vazio vira null e o banco gera um @ a partir do nome.
+    username: normalizeUsername(d.username) || null,
     headline: emptyToNull(d.headline),
     city: emptyToNull(d.city),
     bio: emptyToNull(d.bio),

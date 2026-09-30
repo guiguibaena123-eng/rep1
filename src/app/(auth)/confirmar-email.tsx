@@ -86,7 +86,7 @@ export default function ConfirmEmailScreen() {
         <Text variant="bodySmall" color="textSecondary">
           {t.confirmEmail.hint}
         </Text>
-        {message && (
+        {!!message && (
           <View style={[styles.message, { backgroundColor: colors.warningSoft }]} accessibilityLiveRegion="polite">
             <Text variant="bodySmall" weight="medium" style={{ color: colors.warningInk }}>
               {message}

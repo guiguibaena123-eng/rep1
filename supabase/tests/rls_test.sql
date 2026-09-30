@@ -317,6 +317,288 @@ begin
   update pg_temp._checks set total = total + ok;
 end $$;
 
+-- ========== Explorar (T20–T21): perfil público, seguir, bloquear e denunciar ==========
+-- Os dois terminam o cadastro, com a mesma área e objetivo. Ninguém está público ainda.
+reset role;
+update public.profiles set onboarding_done = true, area = 'vendas', goal = 'estagio'
+where id in ('00000000-0000-4000-a000-00000000000a', '00000000-0000-4000-a000-00000000000b');
+-- Foto antiga de A (não é mais a atual): deve continuar fechada mesmo com o perfil público.
+insert into storage.objects (bucket_id, name, owner)
+values ('avatars', '00000000-0000-4000-a000-00000000000a/avatar-0.jpg', '00000000-0000-4000-a000-00000000000a');
+
+-- ---------- Como B, com A ainda privado ----------
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-00000000000b","role":"authenticated"}', true);
+
+do $$
+declare
+  a constant uuid := '00000000-0000-4000-a000-00000000000a';
+  b constant uuid := '00000000-0000-4000-a000-00000000000b';
+  n int;
+  ok int := 0;
+begin
+  select count(*) into n from public.explore_profiles() where id = a;
+  if n <> 0 then raise exception 'FALHOU: perfil privado de A apareceu no Explorar'; end if;
+  select count(*) into n from public.similar_profiles() where id = a;
+  if n <> 0 then raise exception 'FALHOU: perfil privado de A apareceu em "objetivos parecidos"'; end if;
+  select count(*) into n from public.public_profile(a);
+  if n <> 0 then raise exception 'FALHOU: B abriu o perfil privado de A'; end if;
+  select count(*) into n from storage.objects where name like a::text || '/%';
+  if n <> 0 then raise exception 'FALHOU: B viu a foto de A com o perfil privado'; end if;
+  begin
+    perform public.follow_user(a);
+    raise exception 'FALHOU: B seguiu um perfil privado';
+  exception when sqlstate 'P0002' then null;
+  end;
+  ok := ok + 5;
+
+  -- B liga o próprio "Aparecer no Explorar", mas não o de A.
+  update public.profiles set is_public = true where id = b;
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'FALHOU: B não conseguiu ficar público'; end if;
+  update public.profiles set is_public = true where id = a;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FALHOU: B tornou o perfil de A público'; end if;
+  ok := ok + 2;
+
+  -- Tabelas novas: nada de gravar direto (só pelas funções) e denúncias fechadas.
+  begin
+    insert into public.follows (follower_id, followed_id) values (a, b);
+    raise exception 'FALHOU: B gravou direto em follows';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into public.blocks (blocker_id, blocked_id) values (a, b);
+    raise exception 'FALHOU: B gravou direto em blocks';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    execute 'select count(*) from public.reports';
+    raise exception 'FALHOU: B leu a tabela de denúncias';
+  exception when insufficient_privilege then null;
+  end;
+  ok := ok + 3;
+
+  update pg_temp._checks set total = total + ok;
+end $$;
+
+-- A liga "Aparecer no Explorar".
+reset role;
+update public.profiles set is_public = true where id = '00000000-0000-4000-a000-00000000000a';
+
+-- ---------- Como B, com A público ----------
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-00000000000b","role":"authenticated"}', true);
+
+do $$
+declare
+  a constant uuid := '00000000-0000-4000-a000-00000000000a';
+  b constant uuid := '00000000-0000-4000-a000-00000000000b';
+  n int;
+  pp record;
+  ok int := 0;
+begin
+  select count(*) into n from public.explore_profiles(p_query => 'EMPATIA') where id = a;
+  if n <> 1 then raise exception 'FALHOU: busca por competência não achou A'; end if;
+  select count(*) into n from public.explore_profiles() where id = b;
+  if n <> 0 then raise exception 'FALHOU: B apareceu no próprio Explorar'; end if;
+  select count(*) into n from public.similar_profiles() where id = a;
+  if n <> 1 then raise exception 'FALHOU: A deveria aparecer em "objetivos parecidos"'; end if;
+  -- Sem cidade no próprio perfil, "Perto de mim" não mostra ninguém.
+  select count(*) into n from public.explore_profiles(p_near => true);
+  if n <> 0 then raise exception 'FALHOU: "Perto de mim" sem cidade mostrou perfis'; end if;
+  ok := ok + 4;
+
+  -- Público só pelas funções: a tabela profiles continua fechada.
+  select count(*) into n from public.profiles where id = a;
+  if n <> 0 then raise exception 'FALHOU: B leu a linha de A direto em profiles'; end if;
+  select * into pp from public.public_profile(a);
+  if pp.name is distinct from 'Pessoa A' or not pp.linkedin_done then
+    raise exception 'FALHOU: perfil público de A veio errado';
+  end if;
+  ok := ok + 2;
+
+  -- Fotos: a atual e a capa abrem; a antiga e o PDF do LinkedIn não.
+  select count(*) into n from storage.objects where name in (a::text || '/avatar-1.jpg', a::text || '/cover-1.jpg');
+  if n <> 2 then raise exception 'FALHOU: B deveria ver foto e capa atuais de A (viu %)', n; end if;
+  select count(*) into n from storage.objects where name = a::text || '/avatar-0.jpg';
+  if n <> 0 then raise exception 'FALHOU: B viu uma foto antiga de A'; end if;
+  select count(*) into n from storage.objects where bucket_id = 'linkedin-uploads' and name like a::text || '/%';
+  if n <> 0 then raise exception 'FALHOU: B viu o PDF do LinkedIn de A'; end if;
+  ok := ok + 3;
+
+  -- Seguir.
+  perform public.follow_user(a);
+  perform public.follow_user(a); -- repetir não duplica
+  select count(*) into n from public.follows;
+  if n <> 1 then raise exception 'FALHOU: B deveria ter 1 linha em follows (tem %)', n; end if;
+  select * into pp from public.public_profile(a);
+  if pp.followers <> 1 or not pp.is_following then raise exception 'FALHOU: contagem de seguidores errada'; end if;
+  begin
+    perform public.follow_user(b);
+    raise exception 'FALHOU: B seguiu a si mesmo';
+  exception when sqlstate 'P0002' then null;
+  end;
+  ok := ok + 3;
+
+  -- Seguidores: números e listas.
+  select count(*) into n from public.follow_counts(a) c where c.followers = 1 and c.following = 0;
+  if n <> 1 then raise exception 'FALHOU: follow_counts de A errado'; end if;
+  select count(*) into n from public.follow_counts(b) c where c.following = 1;
+  if n <> 1 then raise exception 'FALHOU: B deveria ver que segue 1 perfil'; end if;
+  select count(*) into n from public.follow_list(a, 'followers') l where l.id = b;
+  if n <> 1 then raise exception 'FALHOU: B deveria aparecer nos seguidores de A'; end if;
+  select count(*) into n from public.follow_list(b, 'following') l where l.id = a and l.is_following;
+  if n <> 1 then raise exception 'FALHOU: A deveria aparecer em "seguindo" de B'; end if;
+  begin
+    perform * from public.follow_list(a, 'amigos');
+    raise exception 'FALHOU: follow_list aceitou tipo inválido';
+  exception when sqlstate '22023' then null;
+  end;
+  ok := ok + 5;
+
+  -- Denunciar.
+  perform public.report_user(a, 'golpe', '  detalhe  ');
+  perform public.report_user(a, 'assedio'); -- mesma pessoa em 24h não duplica
+  begin
+    perform public.report_user(a, 'motivo_inventado');
+    raise exception 'FALHOU: denúncia com motivo inválido';
+  exception when sqlstate '22023' then null;
+  end;
+  begin
+    perform public.report_user(b, 'golpe');
+    raise exception 'FALHOU: B denunciou a si mesmo';
+  exception when sqlstate 'P0002' then null;
+  end;
+  ok := ok + 2;
+
+  -- @ (nome de usuário): A ganhou "pessoa.a" pelo nome; B acha A pelo @.
+  select * into pp from public.public_profile(a);
+  if pp.username is distinct from 'pessoa.a' then raise exception 'FALHOU: @ de A deveria ser pessoa.a (veio %)', pp.username; end if;
+  select count(*) into n from public.explore_profiles(p_query => '@Pessoa.A') where id = a;
+  if n <> 1 then raise exception 'FALHOU: busca por @ exato não achou A'; end if;
+  select count(*) into n from public.explore_profiles(p_query => '@pess') where id = a;
+  if n <> 1 then raise exception 'FALHOU: busca pelo começo do @ não achou A'; end if;
+  select count(*) into n from public.explore_profiles(p_query => '@a') where id = a;
+  if n <> 0 then raise exception 'FALHOU: "@a" achou A (@ deve bater pelo começo)'; end if;
+  if public.username_available('pessoa.a') then raise exception 'FALHOU: @ de A apareceu como livre'; end if;
+  if not public.username_available('livre.b') then raise exception 'FALHOU: @ livre apareceu como usado'; end if;
+  if public.username_available('admin') then raise exception 'FALHOU: @ reservado apareceu como livre'; end if;
+  begin
+    update public.profiles set username = 'pessoa.a' where id = b;
+    raise exception 'FALHOU: B pegou o @ de A';
+  exception when unique_violation then null;
+  end;
+  begin
+    update public.profiles set username = 'admin' where id = b;
+    raise exception 'FALHOU: B usou um @ reservado';
+  exception when check_violation then null;
+  end;
+  begin
+    update public.profiles set username = 'Com Espaço' where id = b;
+    raise exception 'FALHOU: B salvou @ fora do formato';
+  exception when check_violation then null;
+  end;
+  update public.profiles set username = 'livre.b' where id = b;
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'FALHOU: B não conseguiu trocar o próprio @'; end if;
+  ok := ok + 11;
+
+  -- Bloquear: A some para B e o seguir é desfeito.
+  perform public.block_user(a);
+  select count(*) into n from public.explore_profiles() where id = a;
+  if n <> 0 then raise exception 'FALHOU: A bloqueado continuou no Explorar'; end if;
+  select count(*) into n from public.public_profile(a);
+  if n <> 0 then raise exception 'FALHOU: B abriu o perfil de quem bloqueou'; end if;
+  select count(*) into n from public.follows;
+  if n <> 0 then raise exception 'FALHOU: bloquear não desfez o seguir'; end if;
+  select count(*) into n from storage.objects where name like a::text || '/%';
+  if n <> 0 then raise exception 'FALHOU: B viu fotos de A depois de bloquear'; end if;
+  ok := ok + 4;
+
+  update pg_temp._checks set total = total + ok;
+end $$;
+
+-- ---------- Como A: o bloqueio vale nos dois sentidos e é silencioso ----------
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-00000000000a","role":"authenticated"}', true);
+
+do $$
+declare
+  b constant uuid := '00000000-0000-4000-a000-00000000000b';
+  n int;
+  ok int := 0;
+begin
+  select count(*) into n from public.explore_profiles() where id = b;
+  if n <> 0 then raise exception 'FALHOU: A viu no Explorar quem o bloqueou'; end if;
+  select count(*) into n from public.public_profile(b);
+  if n <> 0 then raise exception 'FALHOU: A abriu o perfil de quem o bloqueou'; end if;
+  begin
+    perform public.follow_user(b);
+    raise exception 'FALHOU: A seguiu quem o bloqueou';
+  exception when sqlstate 'P0002' then null;
+  end;
+  select count(*) into n from public.blocks;
+  if n <> 0 then raise exception 'FALHOU: A viu o bloqueio feito por B'; end if;
+  select count(*) into n from public.follow_counts(b);
+  if n <> 0 then raise exception 'FALHOU: A viu os números de quem o bloqueou'; end if;
+  begin
+    perform * from public.follow_list(b, 'followers');
+    raise exception 'FALHOU: A abriu a lista de seguidores de quem o bloqueou';
+  exception when sqlstate 'P0002' then null;
+  end;
+  ok := ok + 6;
+  update pg_temp._checks set total = total + ok;
+end $$;
+
+-- ---------- Sem login: nenhuma função do Explorar ----------
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+reset role;
+set local role anon;
+
+do $$
+declare
+  t text;
+  ok int := 0;
+begin
+  foreach t in array array[
+    'select * from public.explore_profiles()',
+    'select * from public.similar_profiles()',
+    'select * from public.public_profile(gen_random_uuid())',
+    'select public.follow_user(gen_random_uuid())',
+    'select public.report_user(gen_random_uuid(), ''golpe'')',
+    'select public.username_available(''ana'')',
+    'select * from public.follow_counts(gen_random_uuid())',
+    'select * from public.follow_list(gen_random_uuid(), ''followers'')',
+    'select count(*) from public.follows',
+    'select count(*) from public.reports'
+  ] loop
+    begin
+      execute t;
+      raise exception 'FALHOU: sem login rodou: %', t;
+    exception when insufficient_privilege then null;
+    end;
+    ok := ok + 1;
+  end loop;
+  update pg_temp._checks set total = total + ok;
+end $$;
+
+-- ---------- Conferência como administrador: uma denúncia só, com foto do perfil e sem e-mail ----------
+reset role;
+do $$
+declare
+  n int;
+begin
+  select count(*) into n from public.reports
+  where reporter_id = '00000000-0000-4000-a000-00000000000b'
+    and reported_id = '00000000-0000-4000-a000-00000000000a'
+    and reason = 'golpe' and detail = 'detalhe'
+    and snapshot ->> 'name' = 'Pessoa A' and not snapshot ? 'email';
+  if n <> 1 then raise exception 'FALHOU: denúncia deveria ser 1, com detalhe limpo e sem e-mail (achou %)', n; end if;
+  update pg_temp._checks set total = total + 1;
+end $$;
+
 select 'RLS OK (' || total || ' verificações)' as resultado from pg_temp._checks;
 
 rollback;

@@ -234,7 +234,7 @@ export default function AccountScreen() {
           />
         )}
 
-        {formError && (
+        {!!formError && (
           <View style={[styles.formError, { backgroundColor: colors.errorSoft }]} accessibilityLiveRegion="polite">
             <Text variant="bodySmall" weight="medium" style={{ color: colors.toastErrorText }}>
               {formError}

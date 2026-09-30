@@ -3,6 +3,7 @@ import { Check } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Text, useToast } from '@/components';
+import { useAuth } from '@/features/auth/AuthProvider';
 import { Avatar } from '@/features/profile/Avatar';
 import { t } from '@/i18n';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -10,11 +11,16 @@ import { fonts, radius, size, space } from '@/theme/tokens';
 
 import { errorCode, useFollow } from './api';
 import { placeLine, shortLine, topSkills } from './logic';
-import type { ExplorePerson } from './types';
+import type { ExplorePerson, FollowKind } from './types';
 
 const x = t.explore;
 
 export const openPerson = (id: string) => router.push(`/pessoa/${id}`);
+
+/** A própria pessoa (ex.: na lista de seguidores de quem ela segue) abre o Meu perfil, sem botão Seguir. */
+function useIsMe(id: string) {
+  return useAuth().session?.user.id === id;
+}
 
 /**
  * Seguir / Seguindo. Muda na hora (otimista) e volta atrás com aviso se der erro.
@@ -81,19 +87,28 @@ export function FollowButton({
 /** Linha da lista "Pessoas para conhecer": foto, nome, título, cidade · área, até 2 competências e Seguir. */
 export function PersonRow({ person }: { person: ExplorePerson }) {
   const { colors } = useTheme();
+  const isMe = useIsMe(person.id);
   const place = placeLine(person);
   const skills = topSkills(person);
   return (
     <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Pressable
-        onPress={() => openPerson(person.id)}
+        onPress={() => (isMe ? router.push('/meu-perfil') : openPerson(person.id))}
         accessibilityRole="button"
-        accessibilityLabel={x.personA11y(person.name ?? '', [person.headline, place].filter(Boolean).join('. '))}
+        accessibilityLabel={x.personA11y(
+          person.name ?? '',
+          [person.username && `@${person.username}`, person.headline, place].filter(Boolean).join('. '),
+        )}
         style={({ pressed }) => [styles.rowMain, pressed && { opacity: 0.7 }]}
       >
         <Avatar name={person.name} photoPath={person.photo_path} size={48} />
         <View style={styles.rowText}>
           <Text weight="semibold">{person.name}</Text>
+          {!!person.username && (
+            <Text variant="caption" color="textSecondary" numberOfLines={1} style={{ fontFamily: fonts.body400 }}>
+              {`@${person.username}`}
+            </Text>
+          )}
           {!!person.headline && <Text variant="bodySmall">{person.headline}</Text>}
           {!!place && (
             <Text variant="caption" color="textSecondary" style={{ fontFamily: fonts.body400 }}>
@@ -113,7 +128,50 @@ export function PersonRow({ person }: { person: ExplorePerson }) {
           )}
         </View>
       </Pressable>
-      <FollowButton id={person.id} name={person.name} following={person.is_following} />
+      {!isMe && <FollowButton id={person.id} name={person.name} following={person.is_following} />}
+    </View>
+  );
+}
+
+/**
+ * "12 seguidores · 8 seguindo": cada número abre a lista (tela conexoes/[id]).
+ * title é o que aparece no topo da lista (o @ ou o nome da pessoa).
+ */
+export function FollowStats({
+  id,
+  followers,
+  following,
+  title,
+}: {
+  id: string;
+  followers: number;
+  following: number;
+  title: string;
+}) {
+  const open = (tab: FollowKind) => router.push({ pathname: '/conexoes/[id]', params: { id, tab, title } });
+  const items = [
+    { tab: 'followers' as const, n: followers, label: x.followersLabel(followers) },
+    { tab: 'following' as const, n: following, label: x.followingLabel },
+  ];
+  return (
+    <View style={styles.stats}>
+      {items.map(({ tab, n, label }) => (
+        <Pressable
+          key={tab}
+          onPress={() => open(tab)}
+          accessibilityRole="button"
+          accessibilityLabel={t.follows.openA11y(`${n} ${label}`)}
+          hitSlop={8}
+          style={({ pressed }) => [styles.stat, pressed && { opacity: 0.7 }]}
+        >
+          <Text variant="bodySmall" color="textSecondary">
+            <Text variant="bodySmall" weight="semibold">
+              {String(n)}
+            </Text>
+            {` ${label}`}
+          </Text>
+        </Pressable>
+      ))}
     </View>
   );
 }
@@ -134,6 +192,11 @@ export function PersonCard({ person }: { person: ExplorePerson }) {
         <Text weight="semibold" align="center" numberOfLines={2} style={{ fontSize: 15, lineHeight: 20 }}>
           {person.name}
         </Text>
+        {!!person.username && (
+          <Text variant="caption" color="textSecondary" align="center" numberOfLines={1} style={{ fontFamily: fonts.body400 }}>
+            {`@${person.username}`}
+          </Text>
+        )}
         <Text variant="caption" color="textSecondary" align="center" numberOfLines={2} style={styles.cardLine}>
           {line}
         </Text>
@@ -154,6 +217,8 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   followWide: { alignSelf: 'stretch' },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space[4] },
+  stat: { minHeight: 32, justifyContent: 'center' },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
