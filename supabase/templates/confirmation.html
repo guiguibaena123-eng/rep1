@@ -1,0 +1,26 @@
+{{ if eq .Data.language "en" }}
+<h2>Almost there</h2>
+<p>Tap the link below to confirm your email. Then go back to the app and tap "I've confirmed".</p>
+<p><a href="{{ .ConfirmationURL }}">Confirm my email</a></p>
+<p>If you didn't create this account, you can ignore this email.</p>
+{{ else if eq .Data.language "es" }}
+<h2>Ya casi está</h2>
+<p>Toca el enlace de abajo para confirmar tu correo. Después, vuelve a la app y toca "Ya confirmé".</p>
+<p><a href="{{ .ConfirmationURL }}">Confirmar mi correo</a></p>
+<p>Si no creaste esta cuenta, puedes ignorar este correo.</p>
+{{ else if eq .Data.language "fr" }}
+<h2>Presque fini</h2>
+<p>Touche le lien ci-dessous pour confirmer ton e-mail. Ensuite, reviens dans l’app et touche « J’ai confirmé ».</p>
+<p><a href="{{ .ConfirmationURL }}">Confirmer mon e-mail</a></p>
+<p>Si tu n’as pas créé ce compte, tu peux ignorer cet e-mail.</p>
+{{ else if eq .Data.language "de" }}
+<h2>Fast geschafft</h2>
+<p>Tippe auf den Link unten, um deine E-Mail zu bestätigen. Geh danach zurück in die App und tippe auf „Ich habe bestätigt“.</p>
+<p><a href="{{ .ConfirmationURL }}">Meine E-Mail bestätigen</a></p>
+<p>Wenn du dieses Konto nicht erstellt hast, kannst du diese E-Mail ignorieren.</p>
+{{ else }}
+<h2>Falta pouco</h2>
+<p>Toque no link abaixo para confirmar seu e-mail. Depois, volte ao app e toque em "Já confirmei".</p>
+<p><a href="{{ .ConfirmationURL }}">Confirmar meu e-mail</a></p>
+<p>Se não foi você que criou a conta, pode ignorar este e-mail.</p>
+{{ end }}

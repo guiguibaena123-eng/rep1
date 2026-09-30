@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Barra de navegação</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<nav aria-label="Navegação principal" style="width: 390px; height: 84px; box-sizing: border-box; padding: 6px 8px 18px; display: flex; justify-content: space-between; align-items: center; background: {{c.surface}}; border-top: 1px solid {{c.border}}; font-family: Inter, system-ui, sans-serif">
+  <a href="T05Home.dc.html" aria-label="Início" style="width: 72px; height: 58px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{i.inicio.color}}; background: {{i.inicio.bg}}">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"></path></svg>
+    <span style="font-size: 12px; line-height: 16px; font-weight: {{i.inicio.w}}">Início</span>
+  </a>
+  <a href="T06NovaSimulacao.dc.html" aria-label="Treinar" style="width: 72px; height: 58px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{i.treinar.color}}; background: {{i.treinar.bg}}">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+    <span style="font-size: 12px; line-height: 16px; font-weight: {{i.treinar.w}}">Treinar</span>
+  </a>
+  <a href="T20Explorar.dc.html" aria-label="Explorar" style="width: 72px; height: 58px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{i.explorar.color}}; background: {{i.explorar.bg}}">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.2 7.8-2.1 6.3-6.3 2.1 2.1-6.3z"></path></svg>
+    <span style="font-size: 12px; line-height: 16px; font-weight: {{i.explorar.w}}">Explorar</span>
+  </a>
+  <a href="T10LinkedIn.dc.html" aria-label="LinkedIn" style="width: 72px; height: 58px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{i.linkedin.color}}; background: {{i.linkedin.bg}}">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><circle cx="12" cy="13" r="2.5"></circle><path d="M8 19a4 4 0 0 1 8 0"></path></svg>
+    <span style="font-size: 12px; line-height: 16px; font-weight: {{i.linkedin.w}}">LinkedIn</span>
+  </a>
+  <a href="T15Perfil.dc.html" aria-label="Perfil" style="width: 72px; height: 58px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: {{i.perfil.color}}; background: {{i.perfil.bg}}">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+    <span style="font-size: 12px; line-height: 16px; font-weight: {{i.perfil.w}}">Perfil</span>
+  </a>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["inicio","treinar","explorar","linkedin","perfil"],"default":"inicio"},"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":84}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = this.props.dark ?? false;
+    const active = this.props.active ?? 'inicio';
+    const c = dark
+      ? { surface: '#1B1B22', border: '#2A2A34', off: '#A0A0AD', on: '#A9A9F5', onBg: '#23234A' }
+      : { surface: '#FFFFFF', border: '#E8E8F0', off: '#6B6B76', on: '#5B5BD6', onBg: '#EEEEFC' };
+    const i = {};
+    ['inicio', 'treinar', 'explorar', 'linkedin', 'perfil'].forEach((k) => {
+      const on = k === active;
+      i[k] = { color: on ? c.on : c.off, bg: on ? c.onBg : 'transparent', w: on ? 600 : 500 };
+    });
+    return { c, i };
+  }
+}
+</script>
+</body>
+</html>

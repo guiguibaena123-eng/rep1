@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B93FF"/><stop offset="1" stop-color="#0947D0"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#8CC2FF" stop-opacity="0.5"/><stop offset="1" stop-color="#8CC2FF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="st" gradientUnits="userSpaceOnUse" x1="0" y1="226" x2="0" y2="854"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D4E5FF"/></linearGradient>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="26" stdDeviation="26" flood-color="#021F73" flood-opacity="0.40"/></filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="540" r="440" fill="url(#glow)"/>
+  <g transform="translate(2,-28)">
+    <rect x="200" y="480" width="620" height="350" rx="90" fill="#FFFFFF" fill-opacity="0"/>
+    <g filter="url(#sh)">
+      <path d="M270 480 H290 Q200 480 200 570 V740 Q200 830 290 830 H730 Q820 830 820 740 V570 Q820 480 730 480 H400 V360 A110 110 0 0 1 620 360 V395" fill="none" stroke="url(#st)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <path d="M211 590 V730" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="5" stroke-linecap="round"/>
+    <path d="M411 440 V360 A99 99 0 0 1 510 261" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

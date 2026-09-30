@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Criar conta ou entrar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+a{color:#5B5BD6}a:hover{color:#4747B8}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+input:focus{outline:none;border:2px solid #5B5BD6 !important;padding:0 15px !important}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div style="padding: 72px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="36" height="36" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" fill="#5B5BD6"></rect><path d="M14 22a10 10 0 0 1 10-10a10 10 0 0 1 10 10a10 10 0 0 1-10 10h-6l-4 4z" fill="#FFFFFF"></path><path d="m19 22 3.5 3.5L29 19" stroke="#5B5BD6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px">Pronto</span>
+    </div>
+    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px; line-height: 30px">{{heading}}</h1>
+
+    <div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 16px; background: #EDEDF4">
+      <button role="tab" aria-selected="{{isCriar}}" onClick="{{toCriar}}" style="height: 44px; border: 0; border-radius: 12px; font: 600 15px Inter, sans-serif; cursor: pointer; background: {{tabA.bg}}; color: {{tabA.color}}; box-shadow: {{tabA.shadow}}">Criar conta</button>
+      <button role="tab" aria-selected="{{isEntrar}}" onClick="{{toEntrar}}" style="height: 44px; border: 0; border-radius: 12px; font: 600 15px Inter, sans-serif; cursor: pointer; background: {{tabB.bg}}; color: {{tabB.color}}; box-shadow: {{tabB.shadow}}">Entrar</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="email" style="font-size: 14px; line-height: 20px; font-weight: 600">E-mail</label>
+        <input id="email" type="email" autocomplete="email" value="{{email}}" onChange="{{onEmail}}" placeholder="voce@email.com" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: {{emailBorder}}; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+        <sc-if value="{{emailErr}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; color: #C4373C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4M12 16h.01"></path></svg>Esse e-mail não parece certo</div>
+        </sc-if>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="senha" style="font-size: 14px; line-height: 20px; font-weight: 600">Senha</label>
+        <div style="position: relative">
+          <input id="senha" type="{{passType}}" value="{{pass}}" onChange="{{onPass}}" autocomplete="new-password" style="width: 100%; height: 52px; box-sizing: border-box; padding: 0 56px 0 16px; border: {{passBorder}}; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+          <button onClick="{{togglePass}}" aria-label="{{passLabel}}" style="position: absolute; right: 2px; top: 2px; width: 48px; height: 48px; border: 0; background: transparent; color: #6B6B76; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+        <sc-if value="{{passErr}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; color: #C4373C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4M12 16h.01"></path></svg>Use pelo menos 8 caracteres</div>
+        </sc-if>
+      </div>
+      <sc-if value="{{isCriar}}" hint-placeholder-val="{{ true }}">
+        <label style="display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6B6B76; cursor: pointer; min-height: 48px">
+          <input type="checkbox" checked="{{accepted}}" onChange="{{toggleAccept}}" style="width: 22px; height: 22px; margin: 0; accent-color: #5B5BD6; flex-shrink: 0">
+          <span>Li e aceito os <a href="#termos" style="font-weight: 600">Termos</a> e a <a href="#privacidade" style="font-weight: 600">Política de Privacidade</a></span>
+        </label>
+      </sc-if>
+      <sc-if value="{{termsErr}}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 14px; line-height: 20px; color: #C4373C; margin-top: -8px">Para continuar, aceite os Termos.</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="margin-top: auto; padding: 0 20px 36px; display: flex; flex-direction: column; gap: 4px">
+    <sc-if value="{{valid}}" hint-placeholder-val="{{ true }}">
+      <a class="press" href="T04Perfil.dc.html" style="height: 52px; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; display: flex; align-items: center; justify-content: center; text-decoration: none">{{cta}}</a>
+    </sc-if>
+    <sc-if value="{{invalid}}" hint-placeholder-val="{{ false }}">
+      <button class="press" onClick="{{submit}}" style="height: 52px; border: 0; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; cursor: pointer">{{cta}}</button>
+    </sc-if>
+    <button style="height: 48px; border: 0; background: transparent; color: #5B5BD6; font: 600 16px Inter, sans-serif; cursor: pointer">Esqueci minha senha</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'criar', email: 'ana.souza@gmail.com', pass: 'treino2026', show: false, accepted: true, tried: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const criar = s.tab === 'criar';
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email);
+    const passOk = s.pass.length >= 8;
+    const termsOk = !criar || s.accepted;
+    const valid = emailOk && passOk && termsOk;
+    const on = { bg: '#FFFFFF', color: '#1B1B1F', shadow: '0 1px 4px rgba(27,27,31,0.08)' };
+    const off = { bg: 'transparent', color: '#6B6B76', shadow: 'none' };
+    const emailErr = s.tried && !emailOk;
+    const passErr = s.tried && !passOk;
+    return {
+      heading: criar ? 'Que bom ter você aqui' : 'Bem-vindo(a) de volta',
+      isCriar: criar, isEntrar: !criar,
+      tabA: criar ? on : off, tabB: criar ? off : on,
+      toCriar: () => this.setState({ tab: 'criar', tried: false }),
+      toEntrar: () => this.setState({ tab: 'entrar', tried: false }),
+      email: s.email, pass: s.pass,
+      onEmail: (e) => this.setState({ email: e.target.value }),
+      onPass: (e) => this.setState({ pass: e.target.value }),
+      passType: s.show ? 'text' : 'password',
+      passLabel: s.show ? 'Ocultar senha' : 'Mostrar senha',
+      togglePass: () => this.setState({ show: !s.show }),
+      accepted: s.accepted,
+      toggleAccept: () => this.setState({ accepted: !s.accepted }),
+      emailErr, passErr, termsErr: s.tried && !termsOk,
+      emailBorder: emailErr ? '2px solid #E5484D' : '1px solid #E8E8F0',
+      passBorder: passErr ? '2px solid #E5484D' : '1px solid #E8E8F0',
+      valid, invalid: !valid,
+      submit: () => this.setState({ tried: true }),
+      cta: criar ? 'Criar conta' : 'Entrar'
+    };
+  }
+}
+</script>
+</body>
+</html>

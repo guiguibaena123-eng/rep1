@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Resultado da simulação</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+:focus-visible{outline:2px solid #7B7BEA;outline-offset:2px}
+@keyframes ring{from{stroke-dashoffset:327}to{stroke-dashoffset:0}}
+.ring{animation:ring 700ms ease-out both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.fade{animation:fade 200ms ease-out both}
+@media (prefers-reduced-motion: reduce){.ring,.fade{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 2160px; box-sizing: border-box; background: {{c.bg}}; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: {{c.text}}">
+  <div style="padding: 52px 20px 0 8px; display: flex; align-items: center; gap: 4px">
+    <a href="T05Home.dc.html" aria-label="Fechar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: {{c.text}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></a>
+    <span style="font-weight: 600; font-size: 16px">Seu resultado</span>
+  </div>
+
+  <div style="flex-grow: 1; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+
+    <section style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding-top: 8px">
+      <div style="position: relative; width: 150px; height: 150px">
+        <svg width="150" height="150" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="{{c.track}}" stroke-width="9"></circle><circle class="ring" cx="60" cy="60" r="52" fill="none" stroke="#FFB84D" stroke-width="9" stroke-linecap="round" stroke-dasharray="235 327" transform="rotate(-90 60 60)"></circle></svg>
+        <div style="position: absolute; left: 0; top: 0; width: 150px; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center">
+          <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 40px; line-height: 44px">72</span>
+          <span style="font-size: 12px; line-height: 16px; color: {{c.text2}}">de 100</span>
+        </div>
+      </div>
+      <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 22px; line-height: 28px">Bom começo! Você já tem uma base sólida.</h1>
+      <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: {{c.mintSoft}}; color: {{c.mintInk}}; font-size: 14px; line-height: 20px; font-weight: 600">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.5 8.5-5-5L2 17"></path><path d="M16 7h6v6"></path></svg>+6 desde a última
+      </div>
+      <p style="margin: 0; font-size: 16px; line-height: 24px; color: {{c.text2}}">Suas respostas são claras e educadas. O próximo passo é contar mais exemplos reais do que você já fez.</p>
+    </section>
+
+    <section aria-labelledby="bem" style="padding: 20px; border-radius: 20px; background: {{c.mintSoft}}; display: flex; flex-direction: column; gap: 12px">
+      <h2 id="bem" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">O que foi bem</h2>
+      <sc-for list="{{good}}" as="g" hint-placeholder-count="3">
+        <div style="display: flex; gap: 10px; font-size: 16px; line-height: 24px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{c.mintInk}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M20 6 9 17l-5-5"></path></svg>
+          <span>{{g}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-labelledby="melhorar" style="padding: 20px; border-radius: 20px; background: {{c.primarySoft}}; display: flex; flex-direction: column; gap: 4px">
+      <h2 id="melhorar" style="margin: 0 0 8px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">O que melhorar</h2>
+      <sc-for list="{{improve}}" as="m" hint-placeholder-count="3">
+        <div style="border-top: {{m.divider}}">
+          <button onClick="{{m.toggle}}" aria-expanded="{{m.open}}" style="width: 100%; min-height: 52px; padding: 12px 0; border: 0; background: transparent; display: flex; align-items: center; gap: 10px; text-align: left; color: {{c.text}}; font: 600 16px/22px Inter, sans-serif; cursor: pointer">
+            <span style="flex-grow: 1">{{m.title}}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{m.rot}}; transition: transform 200ms ease-out; flex-shrink: 0"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+          <sc-if value="{{m.open}}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="padding: 0 0 14px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 20px">
+              <div><span style="font-weight: 600; color: {{c.primaryInk}}">Por quê · </span><span style="color: {{c.text2}}">{{m.why}}</span></div>
+              <div><span style="font-weight: 600; color: {{c.primaryInk}}">Como fazer · </span><span style="color: {{c.text2}}">{{m.how}}</span></div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-labelledby="rpr" style="display: flex; flex-direction: column; gap: 10px">
+      <h2 id="rpr" style="margin: 0 0 2px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Resposta por resposta</h2>
+      <sc-for list="{{answers}}" as="a" hint-placeholder-count="5">
+        <div style="border-radius: 20px; background: {{c.surface}}; border: 1px solid {{c.border}}; overflow: hidden">
+          <button onClick="{{a.toggle}}" aria-expanded="{{a.open}}" style="width: 100%; min-height: 64px; padding: 14px 16px; border: 0; background: transparent; display: flex; align-items: center; gap: 12px; text-align: left; color: {{c.text}}; cursor: pointer">
+            <span style="width: 28px; height: 28px; border-radius: 999px; background: {{c.bg}}; display: flex; align-items: center; justify-content: center; font: 600 12px Inter, sans-serif; color: {{c.text2}}; flex-shrink: 0">{{a.n}}</span>
+            <span style="flex-grow: 1; font: 600 15px/21px Inter, sans-serif">{{a.q}}</span>
+            <span style="font: 700 15px 'Plus Jakarta Sans', sans-serif; flex-shrink: 0">{{a.score}}<span style="font: 400 12px Inter, sans-serif; color: {{c.text2}}">/10</span></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{a.rot}}; transition: transform 200ms ease-out; flex-shrink: 0"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+          <sc-if value="{{a.open}}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="padding: 0 16px 16px; display: flex; flex-direction: column; gap: 12px">
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <span style="font-size: 12px; line-height: 16px; font-weight: 600; color: {{c.text2}}">SUA RESPOSTA (RESUMO)</span>
+                <span style="font-size: 14px; line-height: 20px; color: {{c.text2}}">{{a.mine}}</span>
+              </div>
+              <div style="font-size: 14px; line-height: 20px">{{a.comment}}</div>
+              <div style="padding: 14px; border-radius: 14px; background: {{c.primarySoft}}; display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 12px; line-height: 16px; font-weight: 600; color: {{c.primaryInk}}">UMA RESPOSTA SUGERIDA</span>
+                <span style="font-size: 14px; line-height: 21px">{{a.suggested}}</span>
+                <button onClick="{{a.copy}}" style="align-self: flex-start; height: 40px; min-width: 48px; padding: 0 14px; border: 0; border-radius: 12px; background: {{c.surface}}; color: {{c.primaryInk}}; font: 600 14px Inter, sans-serif; display: flex; align-items: center; gap: 6px; cursor: pointer">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M4 16V5a1 1 0 0 1 1-1h11"></path></svg>{{a.copyLabel}}
+                </button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-labelledby="passo" style="padding: 20px; border-radius: 20px; background: {{c.surface}}; border: 1px solid {{c.border}}; display: flex; gap: 14px; align-items: flex-start">
+      <div style="width: 40px; height: 40px; border-radius: 999px; background: {{c.primarySoft}}; color: {{c.primaryInk}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 id="passo" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Seu próximo passo</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 24px; color: {{c.text2}}">Treine de novo a pergunta do cliente irritado, contando o que você faria primeiro.</p>
+      </div>
+    </section>
+
+    <p style="margin: 0; font-size: 12px; line-height: 18px; color: {{c.text2}}; text-align: center">O Pronto é uma ferramenta de treino e orientação. Ele não garante contratação e não substitui apoio profissional.</p>
+  </div>
+
+  <div style="padding: 16px 20px 32px; display: flex; flex-direction: column; gap: 4px; background: {{c.bg}}; border-top: 1px solid {{c.border}}">
+    <a class="press" href="T06NovaSimulacao.dc.html" style="height: 52px; border-radius: 14px; background: {{c.primary}}; color: {{c.onPrimary}}; font: 600 16px Inter, sans-serif; display: flex; align-items: center; justify-content: center; text-decoration: none">Treinar de novo</a>
+    <a href="T05Home.dc.html" style="height: 48px; display: flex; align-items: center; justify-content: center; color: {{c.primaryInk}}; font: 600 16px Inter, sans-serif; text-decoration: none">Voltar ao início</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":2160}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { imp: 0, ans: 0, copied: -1 }; }
+  renderVals() {
+    const dark = this.props.dark ?? false;
+    const L = { bg: '#F7F7FB', surface: '#FFFFFF', border: '#E8E8F0', text: '#1B1B1F', text2: '#6B6B76', primary: '#5B5BD6', onPrimary: '#FFFFFF', primaryInk: '#4747B8', primarySoft: '#EEEEFC', mintSoft: '#E3F7F0', mintInk: '#1A7A5A', track: '#E8E8F0', divider: 'rgba(91,91,214,0.18)' };
+    const D = { bg: '#111116', surface: '#1B1B22', border: '#2A2A34', text: '#F2F2F5', text2: '#A0A0AD', primary: '#7B7BEA', onPrimary: '#111116', primaryInk: '#A9A9F5', primarySoft: '#23234A', mintSoft: '#15302A', mintInk: '#5FD8AF', track: '#2A2A34', divider: 'rgba(169,169,245,0.18)' };
+    const c = dark ? D : L;
+    const s = this.state;
+    const improveData = [
+      { title: 'Use exemplos reais', why: 'Exemplos mostram que você já fez, não só que sabe.', how: 'Para cada resposta, conte uma situação da escola, de casa ou de um trabalho voluntário.' },
+      { title: 'Mostre sua atitude primeiro', why: 'Quem entrevista quer ver como você age sozinho(a).', how: 'Diga o que você faria antes de chamar outra pessoa.' },
+      { title: 'Feche com um resultado', why: 'O final é o que a pessoa mais lembra.', how: 'Termine com “no fim, …” e o que mudou por causa da sua ação.' }
+    ];
+    const ansData = [
+      { q: 'Fale um pouco sobre você.', score: 8, mine: 'Contei que tenho 19 anos, faço técnico em Administração e gosto de ajudar pessoas.', comment: 'Clara e direta. Dá para ligar melhor sua história à vaga.', suggested: 'Sou a Ana, tenho 19 anos e estou terminando o técnico em Administração. Na feira de profissões da escola, cuidei do atendimento aos visitantes e descobri que gosto de resolver dúvidas. Por isso quero começar em atendimento.' },
+      { q: 'Uma vez em que você ajudou alguém.', score: 7, mine: 'Ajudei um pai a achar a sala da palestra na feira da escola.', comment: 'Bom exemplo. Conte também o resultado.', suggested: 'Na feira da escola, um pai estava perdido e atrasado. Levei ele até a sala e avisei a palestrante. No fim, ele assistiu desde o início e agradeceu à coordenação.' },
+      { q: 'Por que atendimento?', score: 8, mine: 'Gosto de conversar e de ver a pessoa sair satisfeita.', comment: 'Sincera e positiva. Um exemplo curto deixaria mais forte.', suggested: 'Gosto de conversar e de ver alguém sair com o problema resolvido. Na feira da escola, foi o que mais me deu energia.' },
+      { q: 'Cliente irritado.', score: 5, mine: 'Disse que chamaria o gerente.', comment: 'Dá para melhorar aqui: mostre primeiro o que você faria.', suggested: 'Eu ouviria sem interromper, pediria desculpas pelo transtorno e repetiria o problema para confirmar. Depois, ofereceria uma solução. Se não estivesse ao meu alcance, chamaria o responsável.' },
+      { q: 'Daqui a dois anos.', score: 7, mine: 'Quero estar aprendendo e crescendo na empresa.', comment: 'Boa intenção. Cite algo concreto que quer aprender.', suggested: 'Quero dominar o atendimento, conhecer bem os produtos e, quem sabe, ajudar a treinar quem chegar depois de mim.' }
+    ];
+    return {
+      c,
+      good: ['Respostas claras e educadas', 'Boa apresentação pessoal', 'Mostrou vontade de aprender'],
+      improve: improveData.map((m, k) => ({ ...m, open: s.imp === k, rot: s.imp === k ? 'rotate(180deg)' : 'none', divider: k === 0 ? '0' : '1px solid ' + c.divider, toggle: () => this.setState({ imp: s.imp === k ? -1 : k }) })),
+      answers: ansData.map((a, k) => ({
+        ...a, n: k + 1, open: s.ans === k, rot: s.ans === k ? 'rotate(180deg)' : 'none',
+        toggle: () => this.setState({ ans: s.ans === k ? -1 : k }),
+        copyLabel: s.copied === k ? 'Copiado' : 'Copiar',
+        copy: () => { try { navigator.clipboard.writeText(a.suggested); } catch (e) {} this.setState({ copied: k }); }
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

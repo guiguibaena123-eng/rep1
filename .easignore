@@ -1,0 +1,38 @@
+# Arquivos que NÃO vão para o servidor do EAS Build.
+# Com EAS_NO_VCS=1 (projeto sem Git), o EAS lê este arquivo no lugar do .gitignore.
+#
+# Diferença para o .gitignore: o .env VAI junto, porque ele só tem valores PÚBLICOS
+# (EXPO_PUBLIC_*: URL e chave pública do Supabase, preço, e-mail de ajuda).
+# Segredos (chave da IA, service_role) ficam só no Supabase e nunca no .env.
+
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+.metro-health-check*
+npm-debug.*
+.DS_Store
+*.tsbuildinfo
+/ios
+/android
+
+# Não fazem parte do app
+design/
+pronto-design.zip
+supabase/.temp/
+supabase/migrations/
+supabase/templates/
+supabase/tests/
+supabase/queries/
+prompt-*.md
+.claude/
+.vscode/

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Explorar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+a{color:#5B5BD6}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+.noscroll{scrollbar-width:none}.noscroll::-webkit-scrollbar{display:none}
+input:focus{outline:none;border-color:#5B5BD6 !important;box-shadow:0 0 0 1px #5B5BD6}
+:focus-visible{outline:2px solid #5B5BD6;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1560px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div style="flex-grow: 1; padding: 60px 0 24px; display: flex; flex-direction: column; gap: 20px">
+    <div style="padding: 0 20px; display: flex; align-items: center; min-height: 48px">
+      <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px; line-height: 30px">Explorar</h1>
+
+    </div>
+
+    <div style="padding: 0 20px">
+      <div style="position: relative">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 16px; top: 16px"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input aria-label="Buscar pessoas" type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Buscar por nome, área ou competência" style="width: 100%; height: 52px; box-sizing: border-box; padding: 0 16px 0 46px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      </div>
+    </div>
+
+    <div class="noscroll" role="group" aria-label="Filtros" style="display: flex; gap: 8px; overflow-x: auto; padding: 0 20px">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+        <button aria-pressed="{{f.on}}" onClick="{{f.pick}}" style="flex-shrink: 0; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{f.border}}; background: {{f.bg}}; color: {{f.color}}; font: 500 14px Inter, sans-serif; cursor: pointer; white-space: nowrap">{{f.label}}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{showPrivate}}" hint-placeholder-val="{{ true }}">
+      <div style="margin: 0 20px; padding: 16px; border-radius: 20px; background: #EEEEFC; display: flex; gap: 12px; align-items: flex-start">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4747B8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 15px; line-height: 21px; font-weight: 600">Seu perfil ainda não aparece aqui</span>
+          <span style="font-size: 14px; line-height: 20px; color: #6B6B76">Você pode ver os outros mesmo assim. Aparecer é opcional.</span>
+          <a href="T19EditarPerfil.dc.html" style="align-self: flex-start; min-height: 36px; display: flex; align-items: center; font: 600 14px Inter, sans-serif; color: #4747B8; text-decoration: none">Mostrar meu perfil</a>
+        </div>
+      </div>
+    </sc-if>
+
+    <section aria-labelledby="parecidos" style="display: flex; flex-direction: column; gap: 12px">
+      <div style="padding: 0 20px">
+        <h2 id="parecidos" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Com objetivos parecidos</h2>
+        <div style="font-size: 14px; line-height: 20px; color: #6B6B76">Também buscam o primeiro emprego em atendimento</div>
+      </div>
+      <div class="noscroll" style="display: flex; gap: 12px; overflow-x: auto; padding: 0 20px">
+        <sc-for list="{{similar}}" as="p" hint-placeholder-count="3">
+          <div style="flex-shrink: 0; width: 168px; box-sizing: border-box; padding: 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+            <a href="T21PerfilPessoa.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: #1B1B1F">
+              <span aria-hidden="true" style="width: 64px; height: 64px; border-radius: 999px; background: {{p.bg}}; color: {{p.fg}}; display: flex; align-items: center; justify-content: center; font: 800 20px 'Plus Jakarta Sans', sans-serif">{{p.ini}}</span>
+              <span style="font-size: 15px; line-height: 20px; font-weight: 600">{{p.name}}</span>
+              <span style="font-size: 12px; line-height: 16px; color: #6B6B76; min-height: 32px">{{p.short}}</span>
+            </a>
+            <button class="press" onClick="{{p.follow}}" aria-pressed="{{p.on}}" style="width: 100%; height: 40px; border-radius: 12px; border: 1px solid {{p.btnBorder}}; background: {{p.btnBg}}; color: {{p.btnColor}}; font: 600 14px Inter, sans-serif; cursor: pointer">{{p.btn}}</button>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-labelledby="todos" style="padding: 0 20px; display: flex; flex-direction: column; gap: 10px">
+      <h2 id="todos" style="margin: 0 0 2px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">{{listTitle}}</h2>
+      <sc-for list="{{people}}" as="p" hint-placeholder-count="5">
+        <div style="padding: 14px 14px 14px 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; gap: 12px; align-items: flex-start">
+          <a href="T21PerfilPessoa.dc.html" style="flex-grow: 1; min-width: 0; display: flex; gap: 12px; text-decoration: none; color: #1B1B1F">
+            <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 999px; background: {{p.bg}}; color: {{p.fg}}; display: flex; align-items: center; justify-content: center; font: 800 16px 'Plus Jakarta Sans', sans-serif; flex-shrink: 0">{{p.ini}}</span>
+            <span style="min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 16px; line-height: 22px; font-weight: 600">{{p.name}}</span>
+              <span style="font-size: 14px; line-height: 20px">{{p.headline}}</span>
+              <span style="font-size: 12px; line-height: 16px; color: #6B6B76">{{p.city}} · {{p.area}}</span>
+              <span style="display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px">
+                <sc-for list="{{p.skills}}" as="k" hint-placeholder-count="2">
+                  <span style="height: 26px; padding: 0 10px; border-radius: 999px; background: #F7F7FB; border: 1px solid #E8E8F0; display: inline-flex; align-items: center; font: 500 12px Inter, sans-serif">{{k}}</span>
+                </sc-for>
+              </span>
+            </span>
+          </a>
+          <button class="press" onClick="{{p.follow}}" aria-pressed="{{p.on}}" aria-label="{{p.btn}} {{p.name}}" style="flex-shrink: 0; height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid {{p.btnBorder}}; background: {{p.btnBg}}; color: {{p.btnColor}}; font: 600 13px Inter, sans-serif; cursor: pointer">{{p.btn}}</button>
+        </div>
+      </sc-for>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 28px 20px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+          <span style="font-size: 16px; line-height: 22px; font-weight: 600">Ninguém encontrado</span>
+          <span style="font-size: 14px; line-height: 20px; color: #6B6B76">Tente outro nome ou tire um filtro.</span>
+        </div>
+      </sc-if>
+    </section>
+  </div>
+
+  <dc-import name="NavBar" active="explorar" hint-size="390px,84px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"meuPerfilPublico":{"editor":"boolean","default":false},"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { q: '', following: ['lucas'], filters: ['Atendimento'] }; }
+  renderVals() {
+    const s = this.state;
+    const pal = [['#EEEEFC', '#4747B8'], ['#E3F7F0', '#14573F'], ['#FFF3DE', '#8A5300'], ['#EDEDF4', '#1B1B1F']];
+    const all = [
+      { id: 'lucas', name: 'Lucas Ferreira', ini: 'LF', headline: 'Jovem aprendiz em logística · quer crescer em atendimento', short: 'Jovem aprendiz · Atendimento', city: 'Guarulhos, SP', area: 'Atendimento', skills: ['Comunicação', 'Pontualidade'] },
+      { id: 'bia', name: 'Beatriz Lima', ini: 'BL', headline: 'Estudante de ensino médio · busca o primeiro emprego', short: 'Primeiro emprego · Atendimento', city: 'São Paulo, SP', area: 'Atendimento', skills: ['Empatia', 'Organização'] },
+      { id: 'rafa', name: 'Rafael Santos', ini: 'RS', headline: 'Técnico em informática · estágio em suporte', short: 'Estágio · Tecnologia', city: 'Osasco, SP', area: 'Tecnologia', skills: ['Suporte técnico', 'Excel'] },
+      { id: 'ju', name: 'Júlia Costa', ini: 'JC', headline: 'Vendedora em loja de shopping · quer migrar para atendimento', short: 'Novo emprego · Vendas', city: 'São Paulo, SP', area: 'Vendas', skills: ['Negociação', 'Atendimento'] },
+      { id: 'gabi', name: 'Gabriel Rocha', ini: 'GR', headline: 'Estudante de Administração · primeiro estágio', short: 'Estágio · Administrativo', city: 'Santo André, SP', area: 'Administrativo', skills: ['Pacote Office', 'Organização'] }
+    ];
+    const deco = (p, k) => {
+      const on = s.following.includes(p.id);
+      return {
+        ...p, on, bg: pal[k % 4][0], fg: pal[k % 4][1],
+        btn: on ? 'Seguindo' : 'Seguir',
+        btnBg: on ? '#FFFFFF' : '#5B5BD6', btnColor: on ? '#1B1B1F' : '#FFFFFF', btnBorder: on ? '#E8E8F0' : '#5B5BD6',
+        follow: () => this.setState({ following: on ? s.following.filter((x) => x !== p.id) : s.following.concat(p.id) })
+      };
+    };
+    const decorated = all.map(deco);
+    const q = s.q.trim().toLowerCase();
+    const people = decorated.filter((p) => !q || (p.name + ' ' + p.headline + ' ' + p.area + ' ' + p.skills.join(' ')).toLowerCase().includes(q));
+    const filterLabels = ['Atendimento', 'Primeiro emprego', 'Perto de mim', 'Estágio', 'Jovem aprendiz'];
+    return {
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
+      filters: filterLabels.map((f) => {
+        const on = s.filters.includes(f);
+        return { label: f, on, bg: on ? '#5B5BD6' : '#FFFFFF', color: on ? '#FFFFFF' : '#1B1B1F', border: on ? '#5B5BD6' : '#E8E8F0', pick: () => this.setState({ filters: on ? s.filters.filter((x) => x !== f) : s.filters.concat(f) }) };
+      }),
+      showPrivate: !(this.props.meuPerfilPublico ?? false),
+      similar: decorated.slice(0, 3).map((p) => p),
+      listTitle: q ? 'Resultados' : 'Pessoas para conhecer',
+      people, empty: people.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

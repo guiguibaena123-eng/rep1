@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Ativar o Premium</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div style="padding: 52px 20px 0 8px; display: flex; align-items: center; gap: 4px">
+    <a href="T16Premium.dc.html" aria-label="Voltar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+  </div>
+
+  <div style="flex-grow: 1; padding: 8px 20px 0; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px; line-height: 30px">Como ativar o Premium</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 24px; color: #6B6B76">Nesta fase de testes, a ativação é feita pela nossa equipe.</p>
+    </div>
+
+    <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px">
+      <li style="padding: 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; gap: 12px; align-items: flex-start">
+          <span style="width: 28px; height: 28px; border-radius: 999px; background: #5B5BD6; color: #FFFFFF; font: 600 14px/28px Inter, sans-serif; text-align: center; flex-shrink: 0">1</span>
+          <span style="font-size: 16px; line-height: 24px">Faça o Pix de <b>R$ 14,90</b> para a chave abaixo.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 14px; border-radius: 14px; background: #F7F7FB">
+          <span style="flex-grow: 1; font: 500 14px ui-monospace, Menlo, monospace; color: #1B1B1F">[SUA CHAVE PIX]</span>
+          <button class="press" onClick="{{copy}}" style="height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: #EEEEFC; color: #4747B8; font: 600 14px Inter, sans-serif; display: flex; align-items: center; gap: 6px; cursor: pointer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="2"></rect><path d="M4 16V5a1 1 0 0 1 1-1h11"></path></svg>{{copyLabel}}
+          </button>
+        </div>
+      </li>
+      <li style="padding: 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; gap: 12px; align-items: flex-start">
+        <span style="width: 28px; height: 28px; border-radius: 999px; background: #5B5BD6; color: #FFFFFF; font: 600 14px/28px Inter, sans-serif; text-align: center; flex-shrink: 0">2</span>
+        <span style="font-size: 16px; line-height: 24px">Envie o comprovante pelo WhatsApp, junto com o e-mail da sua conta.</span>
+      </li>
+      <li style="padding: 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; gap: 12px; align-items: flex-start">
+        <span style="width: 28px; height: 28px; border-radius: 999px; background: #5B5BD6; color: #FFFFFF; font: 600 14px/28px Inter, sans-serif; text-align: center; flex-shrink: 0">3</span>
+        <span style="font-size: 16px; line-height: 24px">Liberamos seu Premium em até 24h. Você recebe um aviso no app.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div style="padding: 20px 20px 36px">
+    <a class="press" href="#whatsapp" style="height: 52px; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>Abrir WhatsApp
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { copied: false }; }
+  renderVals() {
+    return {
+      copyLabel: this.state.copied ? 'Copiada' : 'Copiar chave Pix',
+      copy: () => { try { navigator.clipboard.writeText('[SUA CHAVE PIX]'); } catch (e) {} this.setState({ copied: true }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

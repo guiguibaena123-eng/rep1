@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Siwki nutzt deine Fotos nur, damit du dein Profilbild auswählen kannst.",
+    "NSCameraUsageDescription": "Siwki nutzt die Kamera nur, damit du dein Profilbild aufnehmen kannst."
+  }
+}

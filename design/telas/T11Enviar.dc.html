@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Enviar perfil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+a{color:#5B5BD6}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+input:focus,textarea:focus{outline:none;border-color:#5B5BD6 !important;box-shadow:0 0 0 1px #5B5BD6}
+:focus-visible{outline:2px solid #5B5BD6;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1120px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div style="padding: 52px 20px 0 8px; display: flex; align-items: center; gap: 4px">
+    <a href="T10LinkedIn.dc.html" aria-label="Voltar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+    <span style="font-weight: 600; font-size: 16px">Analisar perfil</span>
+  </div>
+
+  <div style="flex-grow: 1; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+    <div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 16px; background: #EDEDF4">
+      <button role="tab" aria-selected="{{isPdf}}" onClick="{{toPdf}}" style="height: 44px; border: 0; border-radius: 12px; font: 600 15px Inter, sans-serif; cursor: pointer; background: {{tA.bg}}; color: {{tA.color}}; box-shadow: {{tA.sh}}">Enviar PDF</button>
+      <button role="tab" aria-selected="{{isText}}" onClick="{{toText}}" style="height: 44px; border: 0; border-radius: 12px; font: 600 15px Inter, sans-serif; cursor: pointer; background: {{tB.bg}}; color: {{tB.color}}; box-shadow: {{tB.sh}}">Colar textos</button>
+    </div>
+
+    <sc-if value="{{isPdf}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <sc-if value="{{noFile}}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{pick}}" style="height: 200px; border-radius: 20px; border: 2px dashed #C9C9DC; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; cursor: pointer; color: #1B1B1F">
+            <span style="width: 56px; height: 56px; border-radius: 999px; background: #EEEEFC; color: #5B5BD6; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path></svg></span>
+            <span style="font: 600 16px Inter, sans-serif">Toque para escolher o arquivo</span>
+            <span style="font: 400 14px Inter, sans-serif; color: #6B6B76">PDF de até 5 MB</span>
+          </button>
+        </sc-if>
+        <sc-if value="{{hasFile}}" hint-placeholder-val="{{ true }}">
+          <div style="padding: 16px; border-radius: 20px; border: 1px solid #E8E8F0; background: #FFFFFF; display: flex; align-items: center; gap: 14px">
+            <span style="width: 48px; height: 48px; border-radius: 14px; background: #EEEEFC; color: #5B5BD6; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M8 13h8M8 17h5"></path></svg></span>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-weight: 600; font-size: 16px; line-height: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Profile_AnaSouza.pdf</div>
+              <div style="font-size: 14px; line-height: 20px; color: #6B6B76">184 KB</div>
+            </div>
+            <button onClick="{{clear}}" style="height: 48px; padding: 0 8px; border: 0; background: transparent; color: #5B5BD6; font: 600 14px Inter, sans-serif; cursor: pointer">Trocar arquivo</button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isText}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{fields}}" as="f" hint-placeholder-count="4">
+          <div style="border-radius: 20px; border: 1px solid #E8E8F0; background: #FFFFFF; overflow: hidden">
+            <button onClick="{{f.toggle}}" aria-expanded="{{f.open}}" style="width: 100%; min-height: 56px; padding: 0 16px; border: 0; background: transparent; display: flex; align-items: center; gap: 10px; text-align: left; color: #1B1B1F; font: 600 16px Inter, sans-serif; cursor: pointer">
+              <span style="flex-grow: 1">{{f.label}}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{f.rot}}; transition: transform 200ms ease-out"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px">
+                <span id="{{f.hid}}" style="font-size: 14px; line-height: 20px; color: #6B6B76">{{f.help}}</span>
+                <textarea aria-label="{{f.label}}" aria-describedby="{{f.hid}}" rows="4" style="width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px/24px Inter, sans-serif; color: #1B1B1F; resize: none"></textarea>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="vaga" style="font-size: 14px; line-height: 20px; font-weight: 600">Que vaga você quer? <span style="font-weight: 400; color: #6B6B76">(opcional)</span></label>
+      <input id="vaga" placeholder="Ex.: Atendimento ao cliente" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      <span style="font-size: 12px; line-height: 16px; color: #6B6B76">Assim as sugestões ficam mais certeiras.</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px; color: #6B6B76">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+      Seu arquivo é usado só para gerar o relatório.
+    </div>
+  </div>
+
+  <div style="padding: 16px 20px 36px">
+    <a class="press" href="T12Relatorio.dc.html" style="height: 52px; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; display: flex; align-items: center; justify-content: center; text-decoration: none">Analisar meu perfil</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1120}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { mode: 'pdf', file: true, open: 0 }; }
+  renderVals() {
+    const s = this.state;
+    const on = { bg: '#FFFFFF', color: '#1B1B1F', sh: '0 1px 4px rgba(27,27,31,0.08)' };
+    const off = { bg: 'transparent', color: '#6B6B76', sh: 'none' };
+    const pdf = s.mode === 'pdf';
+    const fields = [
+      { label: 'Título', help: 'A frase que aparece embaixo do seu nome.' },
+      { label: 'Sobre', help: 'O resumo que você escreveu sobre você.' },
+      { label: 'Experiências', help: 'Empregos, estágios, voluntariado ou projetos.' },
+      { label: 'Formação e habilidades', help: 'Escola, cursos e o que você sabe fazer.' }
+    ].map((f, k) => ({ ...f, hid: 'help-' + k, open: s.open === k, rot: s.open === k ? 'rotate(180deg)' : 'none', toggle: () => this.setState({ open: s.open === k ? -1 : k }) }));
+    return {
+      isPdf: pdf, isText: !pdf,
+      tA: pdf ? on : off, tB: pdf ? off : on,
+      toPdf: () => this.setState({ mode: 'pdf' }),
+      toText: () => this.setState({ mode: 'text' }),
+      hasFile: s.file, noFile: !s.file,
+      pick: () => this.setState({ file: true }),
+      clear: () => this.setState({ file: false }),
+      fields
+    };
+  }
+}
+</script>
+</body>
+</html>

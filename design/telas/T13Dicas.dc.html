@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Dicas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+.noscroll{scrollbar-width:none}.noscroll::-webkit-scrollbar{display:none}
+input:focus{outline:none;border-color:#5B5BD6 !important;box-shadow:0 0 0 1px #5B5BD6}
+:focus-visible{outline:2px solid #5B5BD6;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1200px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div style="flex-grow: 1; padding: 64px 0 24px; display: flex; flex-direction: column; gap: 20px">
+    <div style="padding: 0 20px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; gap: 4px; margin-left: -12px">
+        <a href="T05Home.dc.html" aria-label="Voltar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px; line-height: 30px">Dicas</h1>
+      </div>
+      <div style="position: relative">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 16px; top: 16px"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input aria-label="Buscar dicas" type="search" placeholder="Buscar dicas" style="width: 100%; height: 52px; box-sizing: border-box; padding: 0 16px 0 46px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      </div>
+    </div>
+
+    <div class="noscroll" role="radiogroup" aria-label="Categorias" style="display: flex; gap: 8px; overflow-x: auto; padding: 0 20px">
+      <sc-for list="{{cats}}" as="k" hint-placeholder-count="7">
+        <button role="radio" aria-checked="{{k.on}}" onClick="{{k.pick}}" style="flex-shrink: 0; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid {{k.border}}; background: {{k.bg}}; color: {{k.color}}; font: 500 14px Inter, sans-serif; cursor: pointer; white-space: nowrap">{{k.label}}</button>
+      </sc-for>
+    </div>
+
+    <section aria-labelledby="trilhas" style="display: flex; flex-direction: column; gap: 12px">
+      <h2 id="trilhas" style="margin: 0; padding: 0 20px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Trilhas</h2>
+      <div class="noscroll" style="display: flex; gap: 12px; overflow-x: auto; padding: 0 20px">
+        <sc-for list="{{trails}}" as="t" hint-placeholder-count="3">
+          <a href="T14Leitura.dc.html" style="flex-shrink: 0; width: 240px; box-sizing: border-box; padding: 18px; border-radius: 20px; background: {{t.bg}}; border: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: #1B1B1F">
+            <div style="display: flex; flex-direction: column; gap: 4px; min-height: 64px">
+              <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px; line-height: 22px">{{t.title}}</span>
+              <span style="font-size: 12px; line-height: 16px; color: #6B6B76">{{t.meta}}</span>
+            </div>
+            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{t.p}}" aria-label="{{t.title}}: {{t.p}}%" style="height: 8px; border-radius: 999px; background: #E8E8F0; overflow: hidden"><div style="height: 8px; width: {{t.w}}; border-radius: 999px; background: #5B5BD6"></div></div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="Lista de dicas" style="padding: 0 20px; display: flex; flex-direction: column; gap: 10px">
+      <sc-for list="{{tips}}" as="d" hint-placeholder-count="6">
+        <div style="padding: 16px 8px 16px 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; align-items: center; gap: 8px">
+          <a href="{{d.href}}" style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: #1B1B1F; min-height: 48px; justify-content: center">
+            <span style="font-size: 16px; line-height: 22px; font-weight: 600">{{d.title}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; line-height: 16px; color: #6B6B76">
+              {{d.cat}} · {{d.min}} min
+              <sc-if value="{{d.premium}}" hint-placeholder-val="{{ false }}">
+                <span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 999px; background: #FFB84D; color: #4A2F00; font: 600 12px Inter, sans-serif"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>Premium</span>
+              </sc-if>
+            </span>
+          </a>
+          <button onClick="{{d.fav}}" aria-pressed="{{d.saved}}" aria-label="Favoritar dica" style="width: 48px; height: 48px; border: 0; background: transparent; color: {{d.favColor}}; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="{{d.favFill}}" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          </button>
+        </div>
+      </sc-for>
+    </section>
+  </div>
+
+  <dc-import name="NavBar" active="inicio" hint-size="390px,84px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { cat: 'Todas', saved: [0] }; }
+  renderVals() {
+    const s = this.state;
+    const cats = ['Todas', 'Currículo', 'Entrevista', 'LinkedIn', 'Primeiro emprego', 'Direitos', 'Salário'].map((k) => {
+      const on = k === s.cat;
+      return { label: k, on, bg: on ? '#5B5BD6' : '#FFFFFF', color: on ? '#FFFFFF' : '#1B1B1F', border: on ? '#5B5BD6' : '#E8E8F0', pick: () => this.setState({ cat: k }) };
+    });
+    const trails = [
+      { title: 'Entrevista sem medo', meta: '7 dias · dia 3', p: 43 },
+      { title: 'Currículo do zero', meta: '5 passos · não iniciada', p: 0 },
+      { title: 'Primeiro emprego: guia completo', meta: '8 passos · Premium', p: 0 }
+    ].map((t, k) => ({ ...t, w: t.p + '%', bg: k === 0 ? '#EEEEFC' : '#FFFFFF', border: k === 0 ? '#EEEEFC' : '#E8E8F0' }));
+    const all = [
+      { title: 'Como responder “fale sobre você”', cat: 'Entrevista', min: 2, premium: false },
+      { title: 'Currículo de uma página: o que colocar', cat: 'Currículo', min: 3, premium: false },
+      { title: 'Sem experiência? Comece por aqui', cat: 'Primeiro emprego', min: 4, premium: false },
+      { title: 'Seus direitos como jovem aprendiz', cat: 'Direitos', min: 3, premium: true },
+      { title: 'Como falar de salário sem medo', cat: 'Salário', min: 3, premium: true },
+      { title: 'Foto de perfil no LinkedIn: o básico', cat: 'LinkedIn', min: 2, premium: false },
+      { title: 'Perguntas para fazer no fim da entrevista', cat: 'Entrevista', min: 2, premium: true }
+    ];
+    const tips = all.map((d, k) => ({ ...d, k })).filter((d) => s.cat === 'Todas' || d.cat === s.cat).map((d) => {
+      const saved = s.saved.includes(d.k);
+      return {
+        ...d, saved,
+        href: d.premium ? 'T16Premium.dc.html' : 'T14Leitura.dc.html',
+        favColor: saved ? '#5B5BD6' : '#6B6B76',
+        favFill: saved ? '#5B5BD6' : 'none',
+        fav: () => this.setState({ saved: saved ? s.saved.filter((x) => x !== d.k) : s.saved.concat(d.k) })
+      };
+    });
+    return { cats, trails, tips };
+  }
+}
+</script>
+</body>
+</html>

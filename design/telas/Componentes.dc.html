@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Biblioteca de componentes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB;color:#1B1B1F}
+a{color:#5B5BD6}a:hover{color:#4747B8}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.spin{animation:spin 900ms linear infinite;transform-origin:50% 50%}
+.pulse{animation:pulse 1400ms ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.spin,.pulse{animation:none}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1900px; box-sizing: border-box; padding: 64px 72px; background: #F7F7FB; display: flex; flex-direction: column; gap: 36px; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div>
+    <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 40px; line-height: 44px; letter-spacing: -0.5px">Componentes</div>
+    <div style="font-size: 16px; line-height: 24px; color: #6B6B76">Todos os estados · nomes de camada no padrão Grupo/Variante/Estado</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start">
+
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">1–3 · Botões</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Button/Primary/Default</div>
+        <button style="height: 52px; width: 100%; border: 0; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px/24px Inter, sans-serif">Começar simulação</button>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Button/Primary/Pressed · escala 0.97</div>
+        <button style="height: 52px; width: 100%; border: 0; border-radius: 14px; background: #4747B8; color: #FFFFFF; font: 600 16px/24px Inter, sans-serif; transform: scale(0.97)">Começar simulação</button>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Button/Primary/Disabled</div>
+        <button disabled="" style="height: 52px; width: 100%; border: 0; border-radius: 14px; background: #E8E8F0; color: #A3A3AD; font: 600 16px/24px Inter, sans-serif">Começar simulação</button>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Button/Primary/Loading</div>
+        <button aria-label="Carregando" style="height: 52px; width: 100%; border: 0; border-radius: 14px; background: #5B5BD6; display: flex; align-items: center; justify-content: center">
+          <svg class="spin" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.2-8.6"></path></svg>
+        </button>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Button/Secondary/Default</div>
+        <button style="height: 52px; width: 100%; border: 0; border-radius: 14px; background: #EEEEFC; color: #4747B8; font: 600 16px/24px Inter, sans-serif">Ver dica</button>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Button/Text/Default</div>
+        <div style="display: flex; gap: 8px">
+          <button style="height: 48px; padding: 0 16px; border: 0; background: transparent; color: #5B5BD6; font: 600 16px/24px Inter, sans-serif">Pular</button>
+          <button style="height: 48px; padding: 0 16px; border: 0; background: transparent; color: #5B5BD6; font: 600 16px/24px Inter, sans-serif">Agora não</button>
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">4–5 · Campos</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Input/Text/Default</div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="c-email1" style="font-size: 14px; line-height: 20px; font-weight: 600">E-mail</label>
+          <input id="c-email1" placeholder="voce@email.com" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+        </div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Input/Text/Focus</div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="c-email2" style="font-size: 14px; line-height: 20px; font-weight: 600">E-mail</label>
+          <input id="c-email2" value="ana.souza@" style="height: 52px; box-sizing: border-box; padding: 0 15px; border: 2px solid #5B5BD6; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF; outline: none">
+        </div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Input/Text/Error</div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="c-email3" style="font-size: 14px; line-height: 20px; font-weight: 600">E-mail</label>
+          <input id="c-email3" value="ana.souza@gmail" aria-invalid="true" aria-describedby="c-email3-err" style="height: 52px; box-sizing: border-box; padding: 0 15px; border: 2px solid #E5484D; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+          <div id="c-email3-err" style="display: flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; color: #C4373C">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4M12 16h.01"></path></svg>
+            Esse e-mail não parece certo
+          </div>
+        </div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Input/LongAnswer/Filled</div>
+        <div style="position: relative">
+          <label for="c-long" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Sua resposta</label>
+          <textarea id="c-long" rows="6" style="width: 100%; box-sizing: border-box; padding: 16px 16px 32px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px/24px Inter, sans-serif; color: #1B1B1F; resize: none; background: #FFFFFF">Sou a Ana, tenho 19 anos e estou terminando o ensino médio técnico em administração.</textarea>
+          <span style="position: absolute; right: 14px; bottom: 12px; font-size: 12px; line-height: 16px; color: #6B6B76">86/1000</span>
+        </div>
+      </section>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">6 · Chips  ·  16 · Selo Premium</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Chip/Selected · Chip/Default</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <button aria-pressed="true" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #5B5BD6; background: #5B5BD6; color: #FFFFFF; font: 600 14px Inter, sans-serif; display: flex; align-items: center; gap: 6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Atendimento</button>
+          <button aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #E8E8F0; background: #FFFFFF; color: #1B1B1F; font: 500 14px Inter, sans-serif">Vendas</button>
+          <button aria-pressed="false" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #E8E8F0; background: #FFFFFF; color: #1B1B1F; font: 500 14px Inter, sans-serif">Tecnologia</button>
+        </div>
+        <div style="font-size: 12px; line-height: 16px; color: #6B6B76">Altura visual 40, área de toque 48 (padding invisível).</div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Badge/Premium</div>
+        <div><span style="display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 999px; background: #FFB84D; color: #4A2F00; font: 600 12px Inter, sans-serif"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>Premium</span></div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">7 · Cards  ·  8 · Progresso</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Card/Default</div>
+        <div style="padding: 18px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; align-items: center; gap: 12px">
+          <div style="flex-grow: 1"><div style="font-weight: 600; font-size: 16px; line-height: 24px">Como responder “fale sobre você”</div><div style="font-size: 14px; line-height: 20px; color: #6B6B76">Entrevista · 2 min</div></div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Card/Highlight</div>
+        <div style="padding: 18px; border-radius: 20px; background: #EEEEFC; display: flex; flex-direction: column; gap: 4px">
+          <div style="font-size: 12px; line-height: 16px; font-weight: 600; color: #4747B8">TREINO DE HOJE</div>
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Atendimento · 5 perguntas</div>
+        </div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Progress/InProgress · Progress/Complete</div>
+        <div role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" aria-label="1 de 3 simulações" style="height: 8px; border-radius: 999px; background: #E8E8F0; overflow: hidden"><div style="width: 33%; height: 8px; border-radius: 999px; background: #5B5BD6"></div></div>
+        <div role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-label="Meta completa" style="height: 8px; border-radius: 999px; background: #E8E8F0; overflow: hidden"><div style="width: 100%; height: 8px; border-radius: 999px; background: #2FBF8F"></div></div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">9 · Anel de nota</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">ScoreRing/High · /Mid · /Low</div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+            <div style="position: relative; width: 96px; height: 96px">
+              <svg width="96" height="96" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="#E8E8F0" stroke-width="10"></circle><circle cx="60" cy="60" r="52" fill="none" stroke="#2FBF8F" stroke-width="10" stroke-linecap="round" stroke-dasharray="274 327" transform="rotate(-90 60 60)"></circle></svg>
+              <div style="position: absolute; left: 0; top: 0; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 26px">84</div>
+            </div>
+            <div style="font-size: 12px; line-height: 16px; color: #1A7A5A; font-weight: 600">Mandou bem</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+            <div style="position: relative; width: 96px; height: 96px">
+              <svg width="96" height="96" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="#E8E8F0" stroke-width="10"></circle><circle cx="60" cy="60" r="52" fill="none" stroke="#FFB84D" stroke-width="10" stroke-linecap="round" stroke-dasharray="202 327" transform="rotate(-90 60 60)"></circle></svg>
+              <div style="position: absolute; left: 0; top: 0; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 26px">62</div>
+            </div>
+            <div style="font-size: 12px; line-height: 16px; color: #8A5300; font-weight: 600">Bom começo</div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+            <div style="position: relative; width: 96px; height: 96px">
+              <svg width="96" height="96" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="#E8E8F0" stroke-width="10"></circle><circle cx="60" cy="60" r="52" fill="none" stroke="#A9A9F0" stroke-width="10" stroke-linecap="round" stroke-dasharray="124 327" transform="rotate(-90 60 60)"></circle></svg>
+              <div style="position: absolute; left: 0; top: 0; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 26px">38</div>
+            </div>
+            <div style="font-size: 12px; line-height: 16px; color: #4747B8; font-weight: 600">Em construção</div>
+          </div>
+        </div>
+        <div style="font-size: 12px; line-height: 16px; color: #6B6B76">Sempre com texto gentil ao lado: a cor nunca é a única pista.</div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">11 · Cabeçalho</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Header/Back · Header/Title</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; height: 56px; border: 1px dashed #E8E8F0; border-radius: 14px; padding: 0 4px">
+          <button aria-label="Voltar" style="width: 48px; height: 48px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+          <span style="font-weight: 600; font-size: 16px">Dica</span>
+          <button aria-label="Favoritar" style="width: 48px; height: 48px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; height: 56px; border: 1px dashed #E8E8F0; border-radius: 14px; padding: 0 16px">
+          <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 24px">Dicas</span>
+          <button aria-label="Buscar" style="width: 48px; height: 48px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+        </div>
+      </section>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">10 · Barra inferior</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">NavBar/Active=Início (componente NavBar)</div>
+        <div style="margin: 0 -24px; transform: scale(0.94); transform-origin: left top; height: 80px">
+          <dc-import name="NavBar" active="inicio" hint-size="390px,84px"></dc-import>
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">12 · Bottom sheet</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Sheet/Confirm</div>
+        <div style="border-radius: 20px; background: rgba(27,27,31,0.35); padding: 56px 0 0; overflow: hidden">
+          <div role="dialog" aria-label="Sair da simulação?" style="background: #FFFFFF; border-radius: 28px 28px 0 0; padding: 12px 20px 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 -4px 16px rgba(27,27,31,0.06)">
+            <div style="width: 40px; height: 4px; border-radius: 999px; background: #E8E8F0; align-self: center"></div>
+            <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px; padding-top: 8px">Sair da simulação?</div>
+            <div style="font-size: 14px; line-height: 20px; color: #6B6B76">Suas respostas até aqui não serão salvas.</div>
+            <button style="height: 52px; border: 0; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif">Continuar</button>
+            <button style="height: 48px; border: 0; background: transparent; color: #5B5BD6; font: 600 16px Inter, sans-serif">Sair sem salvar</button>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">13 · Toast (3s, no topo)</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Toast/Success · Toast/Error</div>
+        <div role="status" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 14px; background: #E3F7F0; color: #14573F; font-size: 14px; line-height: 20px; font-weight: 500">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A7A5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Sugestão copiada
+        </div>
+        <div role="alert" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 14px; background: #FDECEC; color: #9E2A2E; font-size: 14px; line-height: 20px; font-weight: 500">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4373C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4M12 16h.01"></path></svg>Não deu para salvar. Tente de novo.
+        </div>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E8E8F0; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">14 · Vazio  ·  15 · Skeleton</h2>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">EmptyState/Default</div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; border-radius: 20px; background: #F7F7FB; text-align: center">
+          <div style="width: 56px; height: 56px; border-radius: 999px; background: #EEEEFC; display: flex; align-items: center; justify-content: center; color: #5B5BD6"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></div>
+          <div style="font-size: 16px; line-height: 24px; font-weight: 600">Nenhuma dica salva ainda</div>
+          <button style="height: 48px; padding: 0 20px; border: 0; border-radius: 14px; background: #EEEEFC; color: #4747B8; font: 600 16px Inter, sans-serif">Ver dicas</button>
+        </div>
+        <div style="font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #6B6B76">Skeleton/Card</div>
+        <div class="pulse" style="padding: 18px; border-radius: 20px; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 10px" aria-label="Carregando">
+          <div style="height: 14px; width: 60%; border-radius: 8px; background: #E8E8F0"></div>
+          <div style="height: 12px; width: 90%; border-radius: 8px; background: #EFEFF5"></div>
+          <div style="height: 12px; width: 40%; border-radius: 8px; background: #EFEFF5"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

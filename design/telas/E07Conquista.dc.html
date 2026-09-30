@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Conquista</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F7F7FB}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+@keyframes pop{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:scale(1)}}
+.pop{animation:pop 250ms ease-out both}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.float{animation:float 2400ms ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.pop,.float{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; background: rgba(27,27,31,0.45); display: flex; align-items: center; justify-content: center; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div class="pop" role="dialog" aria-modal="true" aria-labelledby="conq-t" style="width: 330px; box-sizing: border-box; padding: 28px 24px 20px; border-radius: 28px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; box-shadow: 0 4px 16px rgba(27,27,31,0.06)">
+    <div class="float" style="position: relative; width: 150px; height: 130px" aria-hidden="true">
+      <svg width="150" height="130" viewBox="0 0 150 130">
+        <circle cx="75" cy="68" r="56" fill="{{soft}}"></circle>
+        <circle cx="128" cy="22" r="8" fill="#EEEEFC"></circle>
+        <circle cx="20" cy="30" r="6" fill="#E3F7F0"></circle>
+        <circle cx="130" cy="108" r="5" fill="#FFF3DE"></circle>
+        <circle cx="75" cy="68" r="34" fill="{{strong}}"></circle>
+      </svg>
+      <div style="position: absolute; left: 0; top: 0; width: 150px; height: 136px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 28px">
+        <sc-if value="{{isFirst}}" hint-placeholder-val="{{ true }}"><span style="font-size: 34px">🎉</span></sc-if>
+        <sc-if value="{{isStreak}}" hint-placeholder-val="{{ false }}"><span style="color: #4A2F00">{{days}}</span></sc-if>
+      </div>
+    </div>
+    <h1 id="conq-t" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 24px; line-height: 30px">{{title}}</h1>
+    <p style="margin: 0; font-size: 16px; line-height: 24px; color: #6B6B76">{{text}}</p>
+    <a class="press" href="T05Home.dc.html" style="width: 100%; height: 52px; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; display: flex; align-items: center; justify-content: center; text-decoration: none; margin-top: 8px">Continuar</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tipo":{"editor":"enum","options":["primeira","3dias","7dias"],"default":"primeira"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const t = this.props.tipo ?? 'primeira';
+    const data = {
+      primeira: { title: 'Primeira simulação feita', text: 'O mais difícil é começar, e você já começou.', soft: '#EEEEFC', strong: '#5B5BD6', days: '' },
+      '3dias': { title: '3 dias seguidos', text: 'Constância vale mais que perfeição. Continue no seu ritmo.', soft: '#FFF3DE', strong: '#FFB84D', days: '3' },
+      '7dias': { title: 'Uma semana inteira', text: '7 dias treinando. Sua próxima entrevista vai sentir a diferença.', soft: '#FFF3DE', strong: '#FFB84D', days: '7' }
+    }[t];
+    return { ...data, isFirst: t === 'primeira', isStreak: t !== 'primeira' };
+  }
+}
+</script>
+</body>
+</html>

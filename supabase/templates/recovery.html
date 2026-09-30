@@ -1,0 +1,26 @@
+{{ if eq .Data.language "en" }}
+<h2>Create a new password</h2>
+<p>Open this email on the phone where Siwki is installed and tap the link:</p>
+<p><a href="{{ .ConfirmationURL }}">Create new password</a></p>
+<p>If this wasn't you, you can ignore this email.</p>
+{{ else if eq .Data.language "es" }}
+<h2>Crear una contraseña nueva</h2>
+<p>Abre este correo en el móvil donde tienes instalado Siwki y toca el enlace:</p>
+<p><a href="{{ .ConfirmationURL }}">Crear contraseña nueva</a></p>
+<p>Si no fuiste tú, puedes ignorar este correo.</p>
+{{ else if eq .Data.language "fr" }}
+<h2>Créer un nouveau mot de passe</h2>
+<p>Ouvre cet e-mail sur le téléphone où Siwki est installé et touche le lien :</p>
+<p><a href="{{ .ConfirmationURL }}">Créer un nouveau mot de passe</a></p>
+<p>Si ce n’était pas toi, tu peux ignorer cet e-mail.</p>
+{{ else if eq .Data.language "de" }}
+<h2>Neues Passwort erstellen</h2>
+<p>Öffne diese E-Mail auf dem Handy, auf dem Siwki installiert ist, und tippe auf den Link:</p>
+<p><a href="{{ .ConfirmationURL }}">Neues Passwort erstellen</a></p>
+<p>Wenn du das nicht warst, kannst du diese E-Mail ignorieren.</p>
+{{ else }}
+<h2>Criar uma senha nova</h2>
+<p>Abra este e-mail no celular onde o Siwki está instalado e toque no link:</p>
+<p><a href="{{ .ConfirmationURL }}">Criar senha nova</a></p>
+<p>Se não foi você, pode ignorar este e-mail.</p>
+{{ end }}

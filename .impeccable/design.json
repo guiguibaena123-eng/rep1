@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-30T18:00:00-03:00",
+  "title": "Design System: Siwki",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Índigo Sereno (azul da marca)", "canonical": "#0A5CF0", "tonalRamp": ["#04163D", "#062A73", "#073DAA", "#0947D0", "#0A5CF0", "#4D8DFF", "#A3C6FF", "#E8F0FE"] },
+      "primary-pressed": { "role": "primary", "displayName": "Índigo Profundo", "canonical": "#0947D0" },
+      "primary-soft": { "role": "primary", "displayName": "Névoa Índigo", "canonical": "#E8F0FE" },
+      "primary-ink": { "role": "primary", "displayName": "Índigo Profundo (texto)", "canonical": "#0947D0" },
+      "success": { "role": "secondary", "displayName": "Menta Conquista", "canonical": "#2FBF8F", "tonalRamp": ["#0C3326", "#14573F", "#1A7A5A", "#229E74", "#2FBF8F", "#5FD8AF", "#A8EDD5", "#E3F7F0"] },
+      "warning": { "role": "tertiary", "displayName": "Âmbar Sequência", "canonical": "#FFB84D", "tonalRamp": ["#4A2F00", "#6B4200", "#8A5300", "#B86E00", "#E6951F", "#FFB84D", "#FFC978", "#FFF3DE"] },
+      "error": { "role": "tertiary", "displayName": "Coral Aviso", "canonical": "#E5484D", "tonalRamp": ["#4A1416", "#7A2226", "#9E2A2E", "#C4373C", "#E5484D", "#FF8A8E", "#F9C3C5", "#FDECEC"] },
+      "score-low": { "role": "primary", "displayName": "Azul Suave (nota baixa)", "canonical": "#A3C6FF" },
+      "background": { "role": "neutral", "displayName": "Névoa", "canonical": "#F6F8FC", "tonalRamp": ["#0F1117", "#181C24", "#272C37", "#676E7B", "#A2A8B3", "#E5EAF2", "#F6F8FC", "#FFFFFF"] },
+      "surface": { "role": "neutral", "displayName": "Branco Papel", "canonical": "#FFFFFF" },
+      "border": { "role": "neutral", "displayName": "Linha Suave", "canonical": "#E5EAF2" },
+      "segment-track": { "role": "neutral", "displayName": "Trilho", "canonical": "#EBEFF6" },
+      "text": { "role": "neutral", "displayName": "Grafite", "canonical": "#1B1B1F" },
+      "text-secondary": { "role": "neutral", "displayName": "Cinza Médio", "canonical": "#676E7B" },
+      "text-disabled": { "role": "neutral", "displayName": "Cinza Claro", "canonical": "#A2A8B3" },
+      "text-on-soft": { "role": "neutral", "displayName": "Cinza Azulado", "canonical": "#56617A" },
+      "dot-inactive": { "role": "neutral", "displayName": "Ponto Apagado", "canonical": "#D3DBE8" },
+      "skeleton-soft": { "role": "neutral", "displayName": "Sombra de Carga", "canonical": "#EDF1F7" },
+      "verified-blue": { "role": "primary", "displayName": "Selo Premium", "canonical": "#0A5CF0" },
+      "verified-gold": { "role": "tertiary", "displayName": "Selo do Criador", "canonical": "#C28A0E" },
+      "scrim": { "role": "neutral", "displayName": "Véu", "canonical": "rgba(27,27,31,0.4)" }
+    },
+    "typographyMeta": {
+      "brand-display": { "displayName": "Marca · saudação", "purpose": "The Home greeting in Quicksand." },
+      "brand-title": { "displayName": "Marca · título de aba", "purpose": "Tab titles (Treinar, LinkedIn, Dicas) and the name on Perfil." },
+      "display": { "displayName": "Display", "purpose": "Hero titles inside flows; at most one per screen." },
+      "headline": { "displayName": "Título de tela", "purpose": "Screen titles." },
+      "card-title": { "displayName": "Título de cartão", "purpose": "Highlight cards and bottom sheets." },
+      "title": { "displayName": "Título de seção", "purpose": "Section titles inside a screen." },
+      "body": { "displayName": "Corpo", "purpose": "Default reading and interface text." },
+      "body-small": { "displayName": "Corpo pequeno", "purpose": "Field labels, secondary lines, chips, toasts." },
+      "label": { "displayName": "Legenda", "purpose": "Tab labels, badges, captions, counters; the 12px floor." },
+      "button": { "displayName": "Botão", "purpose": "All button labels." }
+    },
+    "shadows": [
+      { "name": "elevated", "value": "0 4px 16px rgba(27,27,31,0.06)", "purpose": "Bottom sheets, center dialogs, toasts, the selected segment and the rare floating card. Android elevation 3." }
+    ],
+    "motion": [
+      { "name": "fast", "value": "150ms ease-out", "purpose": "Button press scale (0.97) and release; toast exit." },
+      { "name": "base", "value": "200ms ease-out", "purpose": "Toast enter, general state changes." },
+      { "name": "slow", "value": "250ms ease-out", "purpose": "Progress bar fill." },
+      { "name": "sheet", "value": "220ms cubic ease-out", "purpose": "Bottom sheet slide-up." },
+      { "name": "score-fill", "value": "700ms cubic ease-out", "purpose": "Score ring arc filling in." },
+      { "name": "skeleton-pulse", "value": "700ms ease-in-out, repeat, opacity 1 → 0.45", "purpose": "Loading skeletons; stopped when reduce motion is on." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action per screen; full width, bottom half.",
+      "html": "<button class=\"ds-btn-primary\">Começar simulação</button>",
+      "css": ".ds-btn-primary { width: 100%; min-height: 52px; padding: 0 20px; border: none; border-radius: 14px; background: #0A5CF0; color: #FFFFFF; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 24px; font-weight: 600; cursor: pointer; transition: transform 150ms ease-out, background 150ms ease-out; } .ds-btn-primary:active { background: #0947D0; transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 2px solid #0947D0; outline-offset: 2px; } .ds-btn-primary:disabled { background: #E5EAF2; color: #A2A8B3; cursor: default; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Second-most-important action, e.g. Continuar com Google.",
+      "html": "<button class=\"ds-btn-secondary\">Continuar com Google</button>",
+      "css": ".ds-btn-secondary { width: 100%; min-height: 52px; padding: 0 20px; border: none; border-radius: 14px; background: #E8F0FE; color: #0947D0; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 24px; font-weight: 600; cursor: pointer; transition: transform 150ms ease-out; } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: 2px solid #0A5CF0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Button",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Light actions: Pular, Agora não, Ocultar.",
+      "html": "<button class=\"ds-btn-text\">Agora não</button>",
+      "css": ".ds-btn-text { min-height: 48px; padding: 0 16px; border: none; background: transparent; color: #0A5CF0; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 24px; font-weight: 600; cursor: pointer; border-radius: 14px; } .ds-btn-text:active { opacity: 0.7; } .ds-btn-text:focus-visible { outline: 2px solid #0A5CF0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Text field with label above; 2px blue border on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">E-mail</span><input class=\"ds-input\" placeholder=\"voce@email.com\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-family: Inter, system-ui, sans-serif; } .ds-field-label { font-size: 14px; line-height: 20px; font-weight: 600; color: #1B1B1F; } .ds-input { height: 52px; padding: 0 16px; border: 1px solid #E5EAF2; border-radius: 14px; background: #FFFFFF; color: #1B1B1F; font-size: 16px; line-height: 24px; outline: none; } .ds-input::placeholder { color: #A2A8B3; } .ds-input:focus { border: 2px solid #0A5CF0; padding: 0 15px; }"
+    },
+    {
+      "name": "Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill filters and choices; selected is filled brand blue.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">Para você</button><button class=\"ds-chip\">Currículo</button><button class=\"ds-chip\">Entrevista</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; flex-wrap: wrap; } .ds-chip { height: 40px; padding: 0 16px; border: 1px solid #E5EAF2; border-radius: 999px; background: #FFFFFF; color: #1B1B1F; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; } .ds-chip:focus-visible { outline: 2px solid #0A5CF0; outline-offset: 2px; } .ds-chip-on { background: #0A5CF0; border-color: #0A5CF0; color: #FFFFFF; }"
+    },
+    {
+      "name": "Highlight Card",
+      "kind": "card",
+      "refersTo": "card-highlight",
+      "description": "Holds the screen's main action (Treino de hoje).",
+      "html": "<section class=\"ds-card-hl\"><div class=\"ds-card-hl-eyebrow\">TREINO DE HOJE</div><div class=\"ds-card-hl-title\">Atendimento · Primeiro emprego</div><div class=\"ds-card-hl-text\">5 perguntas, cerca de 10 min.</div><button class=\"ds-card-hl-btn\">Começar simulação</button></section>",
+      "css": ".ds-card-hl { display: flex; flex-direction: column; gap: 4px; padding: 18px; border-radius: 20px; background: #E8F0FE; font-family: Inter, system-ui, sans-serif; } .ds-card-hl-eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.4px; color: #0947D0; } .ds-card-hl-title { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-weight: 700; font-size: 20px; line-height: 26px; color: #1B1B1F; } .ds-card-hl-text { font-size: 14px; line-height: 20px; color: #56617A; } .ds-card-hl-btn { margin-top: 12px; min-height: 52px; border: none; border-radius: 14px; background: #0A5CF0; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 150ms ease-out; } .ds-card-hl-btn:active { transform: scale(0.97); background: #0947D0; }"
+    },
+    {
+      "name": "Grouped List",
+      "kind": "custom",
+      "refersTo": "list-group",
+      "description": "Perfil and Configurações rows: icon, label, subtitle, chevron or switch; coral destructive row.",
+      "html": "<div class=\"ds-list-title\">Privacidade</div><div class=\"ds-list\"><div class=\"ds-row\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1B1B1F\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/></svg><span class=\"ds-row-label\">Política de Privacidade</span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#676E7B\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 18 6-6-6-6\"/></svg></div><div class=\"ds-row\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1B1B1F\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M3 3v18h18\"/><path d=\"M8 17V9\"/><path d=\"M13 17V5\"/><path d=\"M18 17v-3\"/></svg><span class=\"ds-row-label\">Mostrar nota média<small>Aparece no seu Meu perfil</small></span><span class=\"ds-switch\" role=\"switch\" aria-checked=\"true\"></span></div><div class=\"ds-row ds-row-danger\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#C4373C\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 6h18\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/><path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/></svg><span class=\"ds-row-label\">Apagar minha conta</span></div></div>",
+      "css": ".ds-list-title { font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #676E7B; padding: 0 4px 8px; } .ds-list { border: 1px solid #E5EAF2; border-radius: 20px; background: #FFFFFF; overflow: hidden; font-family: Inter, system-ui, sans-serif; } .ds-row { display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 14px 16px; box-sizing: border-box; cursor: pointer; } .ds-row + .ds-row { border-top: 1px solid #E5EAF2; } .ds-row:active { opacity: 0.7; } .ds-row:focus-visible { outline: 2px solid #0A5CF0; outline-offset: -2px; } .ds-row-label { flex: 1; display: flex; flex-direction: column; font-size: 16px; line-height: 24px; font-weight: 600; color: #1B1B1F; } .ds-row-label small { font-size: 14px; line-height: 20px; font-weight: 400; color: #676E7B; } .ds-row-danger .ds-row-label { color: #C4373C; } .ds-switch { width: 51px; height: 31px; border-radius: 999px; background: #0A5CF0; position: relative; flex-shrink: 0; } .ds-switch::after { content: ''; position: absolute; top: 2px; right: 2px; width: 27px; height: 27px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }"
+    },
+    {
+      "name": "Score Ring",
+      "kind": "custom",
+      "refersTo": "score-ring",
+      "description": "Signature 0–100 score with its kind band label; mint 75+, amber 50–74, soft blue below 50.",
+      "html": "<figure class=\"ds-ring\" aria-label=\"Nota 78 de 100, Mandou bem\"><svg width=\"96\" height=\"96\" viewBox=\"0 0 120 120\"><circle cx=\"60\" cy=\"60\" r=\"52\" fill=\"none\" stroke=\"#E5EAF2\" stroke-width=\"10\"/><circle class=\"ds-ring-arc\" cx=\"60\" cy=\"60\" r=\"52\" fill=\"none\" stroke=\"#2FBF8F\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-dasharray=\"326.7 326.7\" stroke-dashoffset=\"71.9\" transform=\"rotate(-90 60 60)\"/><text x=\"60\" y=\"70\" text-anchor=\"middle\" font-family=\"Plus Jakarta Sans, system-ui, sans-serif\" font-weight=\"800\" font-size=\"30\" fill=\"#1B1B1F\">78</text></svg><figcaption>Mandou bem</figcaption></figure>",
+      "css": ".ds-ring { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; margin: 0; font-family: Inter, system-ui, sans-serif; } .ds-ring figcaption { font-size: 12px; line-height: 16px; font-weight: 600; color: #1A7A5A; } .ds-ring-arc { transition: stroke-dashoffset 700ms cubic-bezier(0.33, 1, 0.68, 1); }"
+    },
+    {
+      "name": "Navigation Bar",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Five fixed tabs; active item gets a Névoa Índigo pill and blue icon and label.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-on\" aria-current=\"page\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Início</a><a class=\"ds-nav-item\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>Treinar</a><a class=\"ds-nav-item\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/></svg>Dicas</a><a class=\"ds-nav-item\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></svg>Perfil</a></nav>",
+      "css": ".ds-nav { display: flex; justify-content: space-between; padding: 6px 8px 18px; background: #FFFFFF; border-top: 1px solid #E5EAF2; font-family: Inter, system-ui, sans-serif; } .ds-nav-item { flex: 1; max-width: 72px; min-height: 58px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; line-height: 16px; font-weight: 500; color: #676E7B; cursor: pointer; text-decoration: none; } .ds-nav-item:focus-visible { outline: 2px solid #0A5CF0; outline-offset: 2px; } .ds-nav-on { background: #E8F0FE; color: #0A5CF0; font-weight: 600; }"
+    },
+    {
+      "name": "Premium Badge",
+      "kind": "chip",
+      "refersTo": "badge-premium",
+      "description": "Quiet amber pill with a lock that marks locked features.",
+      "html": "<span class=\"ds-badge-premium\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/></svg>Premium</span>",
+      "css": ".ds-badge-premium { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 999px; background: #FFB84D; color: #4A2F00; font-family: Inter, system-ui, sans-serif; font-size: 12px; line-height: 16px; font-weight: 600; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Treino Tranquilo",
+    "overview": "Siwki is the calm room where a nervous young person rehearses before the real thing. Every screen should feel like a deep breath: generous white space, few elements, soft rounded forms, and one clear next step. The system lowers the stakes on purpose. Color draws the eye without shouting, feedback encourages, and nothing counts down, flashes, or scolds.\n\nDensity is low and the rhythm is relaxed: 20px side margins, 24–32px between sections, and a single full-width primary button in thumb reach. Personality lives in precise, gentle details: a confident brand blue that stays calm rather than corporate, rounded Quicksand titles that echo the stroke of the bag logo, a button that sinks slightly under the thumb, a score ring that fills in slowly and always comes with kind words. The look is young without being childish. There is no mascot, no stock photography, and no decorative noise. Shapes, icons and type do the work, which also keeps the app light on low-end phones.\n\nThe same Siwki look ships on iPhone and Android. It is one shared design language, not a per-OS restyle, while each OS keeps its expected behaviors: back gesture/button, keyboard, safe areas, and system pickers.",
+    "keyCharacteristics": [
+      "One main action per screen, full-width at the bottom half.",
+      "Borders before shadows; surfaces are flat and quiet.",
+      "Soft, generously rounded corners everywhere (14 / 20 / 28 / pill).",
+      "Brand blue as the single brand voice, plus at most one accent per screen.",
+      "The bag logo sits in the top-left corner of every tab; tab titles are rounded Quicksand.",
+      "Kind feedback colors: low scores are never red.",
+      "Full light and dark themes, with WCAG AA contrast in both."
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Besides indigo, a screen uses at most one accent color (mint, amber, or coral). If two compete, one of them is wrong.", "section": "colors" },
+      { "name": "The Gentle Score Rule", "body": "Scores use mint (75+), amber (50–74), or soft indigo score-low (below 50), always with a kind label next to them. Coral never marks a low score; it is reserved for real errors.", "section": "colors" },
+      { "name": "The Ink Rule", "body": "Text on mint, amber, or soft surfaces uses the matching *-ink tone, never the fill color. Secondary text on Névoa Índigo uses Cinza Azulado (text-on-soft), never Cinza Médio. Toast text uses its own deeper tone (toast-success-text, toast-error-text) to stay AA on the soft fill. In dark mode, text on the primary button is dark-on-primary, because white fails AA on the lighter blue.", "section": "colors" },
+      { "name": "The Two Weights Rule", "body": "A screen uses at most two weights of body type. Headings take their weight from the font file (700 or 800); never add fontWeight on top of a custom font.", "section": "typography" },
+      { "name": "The 130% Rule", "body": "Layouts must survive system text at 130% without clipping or overlap: let text wrap (buttons allow two lines) instead of fixing heights around it.", "section": "typography" },
+      { "name": "The Border-First Rule", "body": "Separate with a hairline border or a tonal step before reaching for a shadow. If a card has both a border and a shadow, one should go.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep exactly one primary button per screen, full width, 52px, in the bottom half.",
+      "Do use src/theme/tokens.ts values (space[n], radius.*, color tokens) instead of loose numbers or hex codes.",
+      "Do pair every score color with a gentle text label, and use mint / amber / soft indigo for scores.",
+      "Do keep animations at 150–250ms ease-out and skip them when \"reduce motion\" is on.",
+      "Do show skeletons while loading; never a blank screen.",
+      "Do check both light and dark themes for AA contrast, and text at 130%.",
+      "Do keep Lucide icons at stroke 1.75, one style everywhere.",
+      "Do open every tab with Screen brand (bag logo in the corner) and a Quicksand Brand Title.",
+      "Do put settings-shaped content in Grouped Lists, not in stacks of loose cards."
+    ],
+    "donts": [
+      "Don't use coral for low scores, streak loss, or limits; coral is for real errors only.",
+      "Don't add more than one accent color (mint, amber, coral) to a screen besides indigo.",
+      "Don't use stock photos, mascots, or heavy imagery; shapes, icons and type carry the look.",
+      "Don't use more than one emoji per screen, and only in achievements and greetings.",
+      "Don't add aggressive counters, countdowns, or pushy \"you're missing out\" styling; Premium is marked by the quiet amber badge.",
+      "Don't stack shadows on bordered cards, or use shadows outside sheets, toasts and floating cards.",
+      "Don't set text below 12px or body text below 16px."
+    ]
+  }
+}

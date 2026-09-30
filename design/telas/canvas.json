@@ -1,0 +1,438 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Componentes.dc.html": {
+      "h": 1900,
+      "title": "Biblioteca de componentes",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "D05Home.dc.html": {
+      "h": 1560,
+      "is_interactive": true,
+      "title": "T5 · Início (escuro)",
+      "w": 390,
+      "x": 0,
+      "y": 10904
+    },
+    "D07Respondendo.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T7 · Respondendo (escuro)",
+      "w": 390,
+      "x": 470,
+      "y": 10904
+    },
+    "D09Resultado.dc.html": {
+      "h": 2160,
+      "is_interactive": true,
+      "title": "T9 · Resultado (escuro)",
+      "w": 390,
+      "x": 940,
+      "y": 10904
+    },
+    "D12Relatorio.dc.html": {
+      "h": 2440,
+      "is_interactive": true,
+      "title": "T12 · Relatório (escuro)",
+      "w": 390,
+      "x": 1410,
+      "y": 10904
+    },
+    "E01Carregando.dc.html": {
+      "h": 844,
+      "title": "Carregando · Início",
+      "w": 390,
+      "x": 0,
+      "y": 13744
+    },
+    "E01bCarregandoDicas.dc.html": {
+      "h": 844,
+      "title": "Carregando · Dicas",
+      "w": 390,
+      "x": 470,
+      "y": 13744
+    },
+    "E01cCarregandoRelatorio.dc.html": {
+      "h": 844,
+      "title": "Carregando · Relatório",
+      "w": 390,
+      "x": 940,
+      "y": 13744
+    },
+    "E02SemInternet.dc.html": {
+      "h": 844,
+      "title": "Sem internet",
+      "w": 390,
+      "x": 1410,
+      "y": 13744
+    },
+    "E03Erro.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Erro geral",
+      "w": 390,
+      "x": 1880,
+      "y": 13744
+    },
+    "E04Limite.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Limite do plano grátis",
+      "w": 390,
+      "x": 2350,
+      "y": 13744
+    },
+    "E05PdfInvalido.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Arquivo inválido",
+      "w": 390,
+      "x": 2820,
+      "y": 13744
+    },
+    "E06Vazios.dc.html": {
+      "h": 1000,
+      "is_interactive": true,
+      "title": "Estados vazios",
+      "w": 390,
+      "x": 3290,
+      "y": 13744
+    },
+    "E07Conquista.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Conquista",
+      "w": 390,
+      "x": 3760,
+      "y": 13744
+    },
+    "E08HomeNovo.dc.html": {
+      "h": 1560,
+      "is_interactive": true,
+      "title": "Início · usuário novo",
+      "w": 390,
+      "x": 4230,
+      "y": 13744
+    },
+    "E09RelatorioGratis.dc.html": {
+      "h": 2440,
+      "is_interactive": true,
+      "title": "Relatório · plano grátis",
+      "w": 390,
+      "x": 4700,
+      "y": 13744
+    },
+    "Main.dc.html": {
+      "h": 1240,
+      "title": "Guia de estilo",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "NavBar.dc.html": {
+      "h": 84,
+      "is_interactive": true,
+      "title": "NavBar (componente)",
+      "w": 390,
+      "x": 3040,
+      "y": 0
+    },
+    "T01Abertura.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T1 · Abertura",
+      "w": 390,
+      "x": 0,
+      "y": 2300
+    },
+    "T02BoasVindas.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T2 · Boas-vindas",
+      "w": 390,
+      "x": 470,
+      "y": 2300
+    },
+    "T03Conta.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T3 · Criar conta / Entrar",
+      "w": 390,
+      "x": 940,
+      "y": 2300
+    },
+    "T04Perfil.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T4 · Conhecendo você",
+      "w": 390,
+      "x": 1410,
+      "y": 2300
+    },
+    "T05Home.dc.html": {
+      "h": 1560,
+      "is_interactive": true,
+      "title": "T5 · Início",
+      "w": 390,
+      "x": 0,
+      "y": 3544
+    },
+    "T06NovaSimulacao.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "T6 · Nova simulação",
+      "w": 390,
+      "x": 470,
+      "y": 3544
+    },
+    "T07Respondendo.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T7 · Respondendo",
+      "w": 390,
+      "x": 1410,
+      "y": 3544
+    },
+    "T07aRespire.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T7 · Antes de começar",
+      "w": 390,
+      "x": 940,
+      "y": 3544
+    },
+    "T08Gerando.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T8 · Gerando feedback",
+      "w": 390,
+      "x": 1880,
+      "y": 3544
+    },
+    "T09Resultado.dc.html": {
+      "h": 2160,
+      "is_interactive": true,
+      "title": "T9 · Resultado",
+      "w": 390,
+      "x": 2350,
+      "y": 3544
+    },
+    "T10LinkedIn.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "T10 · LinkedIn",
+      "w": 390,
+      "x": 0,
+      "y": 6104
+    },
+    "T11Enviar.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "T11 · Enviar / colar",
+      "w": 390,
+      "x": 470,
+      "y": 6104
+    },
+    "T12Relatorio.dc.html": {
+      "h": 2440,
+      "is_interactive": true,
+      "title": "T12 · Relatório (Premium)",
+      "w": 390,
+      "x": 940,
+      "y": 6104
+    },
+    "T13Dicas.dc.html": {
+      "h": 1200,
+      "is_interactive": true,
+      "title": "T13 · Dicas",
+      "w": 390,
+      "x": 0,
+      "y": 8944
+    },
+    "T14Leitura.dc.html": {
+      "h": 1560,
+      "is_interactive": true,
+      "title": "T14 · Leitura",
+      "w": 390,
+      "x": 470,
+      "y": 8944
+    },
+    "T15Perfil.dc.html": {
+      "h": 1420,
+      "is_interactive": true,
+      "title": "T15 · Perfil",
+      "w": 390,
+      "x": 940,
+      "y": 8944
+    },
+    "T16Premium.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "T16 · Premium",
+      "w": 390,
+      "x": 1410,
+      "y": 8944
+    },
+    "T17Pagamento.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "T17 · Pagamento (teste)",
+      "w": 390,
+      "x": 1880,
+      "y": 8944
+    },
+    "T18MeuPerfil.dc.html": {
+      "h": 2360,
+      "is_interactive": true,
+      "title": "T18 · Meu perfil",
+      "w": 390,
+      "x": 2350,
+      "y": 8944
+    },
+    "T19EditarPerfil.dc.html": {
+      "h": 2800,
+      "is_interactive": true,
+      "title": "T19 · Editar perfil",
+      "w": 390,
+      "x": 2820,
+      "y": 8944
+    },
+    "T20Explorar.dc.html": {
+      "h": 1560,
+      "is_interactive": true,
+      "title": "T20 · Explorar",
+      "w": 390,
+      "x": 0,
+      "y": 16584
+    },
+    "T21PerfilPessoa.dc.html": {
+      "h": 1640,
+      "is_interactive": true,
+      "title": "T21 · Perfil de outra pessoa",
+      "w": 390,
+      "x": 470,
+      "y": 16584
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-27T01:33:28Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "rowDark": {
+      "kind": "title1",
+      "maxW": 1800,
+      "text": "Modo escuro",
+      "w": 240,
+      "x": 0,
+      "y": 10604
+    },
+    "rowDicas": {
+      "kind": "title1",
+      "maxW": 3210,
+      "text": "Dicas, Perfil e Premium · T13 a T19",
+      "w": 240,
+      "x": 0,
+      "y": 8644
+    },
+    "rowEstados": {
+      "kind": "title1",
+      "maxW": 5090,
+      "text": "Estados",
+      "w": 240,
+      "x": 0,
+      "y": 13444
+    },
+    "rowExplorar": {
+      "kind": "title1",
+      "maxW": 860,
+      "text": "Explorar · T20 e T21",
+      "w": 240,
+      "x": 0,
+      "y": 16284
+    },
+    "rowFund": {
+      "kind": "title1",
+      "maxW": 3430,
+      "text": "Fundamentos",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "rowLinkedin": {
+      "kind": "title1",
+      "maxW": 1330,
+      "text": "LinkedIn · T10 a T12",
+      "w": 240,
+      "x": 0,
+      "y": 5804
+    },
+    "rowOnb": {
+      "kind": "title1",
+      "maxW": 1800,
+      "text": "Onboarding · T1 a T4",
+      "w": 240,
+      "x": 0,
+      "y": 2000
+    },
+    "rowTreino": {
+      "kind": "title1",
+      "maxW": 2740,
+      "text": "Treino · T5 a T9 (protótipo T1 → T9)",
+      "w": 240,
+      "x": 0,
+      "y": 3244
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Componentes.dc.html",
+    "NavBar.dc.html",
+    "T01Abertura.dc.html",
+    "T02BoasVindas.dc.html",
+    "T03Conta.dc.html",
+    "T04Perfil.dc.html",
+    "T05Home.dc.html",
+    "T06NovaSimulacao.dc.html",
+    "T07aRespire.dc.html",
+    "T07Respondendo.dc.html",
+    "T08Gerando.dc.html",
+    "T09Resultado.dc.html",
+    "T10LinkedIn.dc.html",
+    "T11Enviar.dc.html",
+    "T12Relatorio.dc.html",
+    "T13Dicas.dc.html",
+    "T14Leitura.dc.html",
+    "T15Perfil.dc.html",
+    "T16Premium.dc.html",
+    "T17Pagamento.dc.html",
+    "T18MeuPerfil.dc.html",
+    "T19EditarPerfil.dc.html",
+    "D05Home.dc.html",
+    "D07Respondendo.dc.html",
+    "D09Resultado.dc.html",
+    "D12Relatorio.dc.html",
+    "E01Carregando.dc.html",
+    "E01bCarregandoDicas.dc.html",
+    "E01cCarregandoRelatorio.dc.html",
+    "E02SemInternet.dc.html",
+    "E03Erro.dc.html",
+    "E04Limite.dc.html",
+    "E05PdfInvalido.dc.html",
+    "E06Vazios.dc.html",
+    "E07Conquista.dc.html",
+    "E08HomeNovo.dc.html",
+    "E09RelatorioGratis.dc.html",
+    "T20Explorar.dc.html",
+    "T21PerfilPessoa.dc.html"
+  ],
+  "pages": [],
+  "title": "Pronto — app de treino de entrevista"
+}

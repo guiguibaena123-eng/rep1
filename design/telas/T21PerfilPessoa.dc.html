@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Perfil de outra pessoa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+a{color:#5B5BD6}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+:focus-visible{outline:2px solid #5B5BD6;outline-offset:2px}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.up{animation:up 220ms ease-out both}
+@media (prefers-reduced-motion: reduce){.up{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 1640px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F; overflow: hidden">
+
+  <div style="position: relative; height: 160px; background: #E3F7F0; overflow: hidden">
+    <svg width="390" height="160" viewBox="0 0 390 160" aria-hidden="true" style="position: absolute; left: 0; top: 0"><circle cx="330" cy="30" r="64" fill="#CDEFE3"></circle><circle cx="60" cy="150" r="40" fill="#EEEEFC"></circle></svg>
+    <div style="position: relative; padding: 52px 8px 0; display: flex; justify-content: space-between">
+      <a href="T20Explorar.dc.html" aria-label="Voltar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+      <button onClick="{{openMenu}}" aria-label="Mais opções" style="width: 48px; height: 48px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #1B1B1F; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; padding: 0 20px 32px; margin-top: -48px; position: relative; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span aria-hidden="true" style="width: 96px; height: 96px; border-radius: 999px; border: 4px solid #F7F7FB; box-sizing: border-box; background: #EEEEFC; color: #4747B8; display: flex; align-items: center; justify-content: center; font: 800 30px 'Plus Jakarta Sans', sans-serif">LF</span>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 26px; line-height: 32px">Lucas Ferreira</h1>
+        <p style="margin: 0; font-size: 16px; line-height: 22px">Jovem aprendiz em logística · quer crescer em atendimento</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px 14px; padding-top: 4px; font-size: 14px; line-height: 20px; color: #6B6B76">
+          <span>Guarulhos, SP</span>
+          <span><b style="color: #1B1B1F">{{followers}}</b> seguidores</span>
+          <span><b style="color: #1B1B1F">31</b> seguindo</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex">
+      <button class="press" onClick="{{toggleFollow}}" aria-pressed="{{following}}" style="flex-grow: 1; height: 48px; border-radius: 14px; border: 1px solid {{fBorder}}; background: {{fBg}}; color: {{fColor}}; font: 600 16px Inter, sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px">
+        <sc-if value="{{following}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>{{fLabel}}
+      </button>
+
+    </div>
+
+    <section aria-labelledby="sobre" style="padding: 18px 20px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="sobre" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Sobre</h2>
+      <p style="margin: 0; font-size: 16px; line-height: 24px">Sou jovem aprendiz no centro de distribuição de uma rede de mercados. Gosto de conversar e de resolver problemas, e quero ir para o atendimento ao cliente.</p>
+    </section>
+
+    <section aria-labelledby="comp" style="padding: 18px 20px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 12px">
+      <h2 id="comp" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Competências</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <span style="height: 36px; padding: 0 12px; border-radius: 999px; background: #E3F7F0; color: #14573F; display: inline-flex; align-items: center; gap: 6px; font: 600 14px Inter, sans-serif"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Comunicação</span>
+        <span style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #E8E8F0; display: inline-flex; align-items: center; font: 500 14px Inter, sans-serif">Pontualidade</span>
+        <span style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #E8E8F0; display: inline-flex; align-items: center; font: 500 14px Inter, sans-serif">Controle de estoque</span>
+        <span style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #E8E8F0; display: inline-flex; align-items: center; font: 500 14px Inter, sans-serif">Trabalho em equipe</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="busca" style="padding: 18px 20px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 12px">
+      <h2 id="busca" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">O que busca</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <div style="padding: 12px; border-radius: 14px; background: #F7F7FB"><div style="font-size: 12px; line-height: 16px; color: #6B6B76">Objetivo</div><div style="font-size: 15px; line-height: 21px; font-weight: 600">Novo emprego</div></div>
+        <div style="padding: 12px; border-radius: 14px; background: #F7F7FB"><div style="font-size: 12px; line-height: 16px; color: #6B6B76">Área</div><div style="font-size: 15px; line-height: 21px; font-weight: 600">Atendimento</div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="exp" style="padding: 18px 20px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 12px">
+      <h2 id="exp" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Experiência e formação</h2>
+      <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; line-height: 22px; font-weight: 600">Jovem aprendiz · Logística</span><span style="font-size: 14px; line-height: 20px; color: #6B6B76">Rede de mercados · 2025 até hoje</span></div>
+      <div style="display: flex; flex-direction: column; gap: 2px; padding-top: 12px; border-top: 1px solid #F0F0F5"><span style="font-size: 16px; line-height: 22px; font-weight: 600">Ensino médio</span><span style="font-size: 14px; line-height: 20px; color: #6B6B76">Conclusão em 2026</span></div>
+    </section>
+
+    <section aria-labelledby="conq" style="padding: 18px 20px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 10px">
+      <h2 id="conq" style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Conquistas</h2>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <span style="height: 32px; padding: 0 12px; border-radius: 999px; background: #FFF3DE; color: #8A5300; display: inline-flex; align-items: center; font: 600 13px Inter, sans-serif">7 dias seguidos</span>
+        <span style="height: 32px; padding: 0 12px; border-radius: 999px; background: #EEEEFC; color: #4747B8; display: inline-flex; align-items: center; font: 600 13px Inter, sans-serif">10 simulações</span>
+      </div>
+      <span style="font-size: 12px; line-height: 16px; color: #6B6B76">Notas das simulações não são mostradas para outras pessoas.</span>
+    </section>
+  </div>
+
+  <dc-import name="NavBar" active="explorar" hint-size="390px,84px"></dc-import>
+
+  <sc-if value="{{menu}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 0; top: 0; width: 390px; height: 1640px; background: rgba(27,27,31,0.4); display: flex; flex-direction: column; justify-content: flex-start; padding-top: 520px; box-sizing: border-box">
+      <div class="up" role="dialog" aria-modal="true" aria-label="Opções do perfil" style="background: #FFFFFF; border-radius: 28px 28px 0 0; padding: 12px 20px 28px; display: flex; flex-direction: column; gap: 4px">
+        <div style="width: 40px; height: 4px; border-radius: 999px; background: #E8E8F0; align-self: center; margin-bottom: 8px"></div>
+        <sc-if value="{{menuMain}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column">
+            <button onClick="{{toReport}}" style="min-height: 56px; border: 0; background: transparent; display: flex; align-items: center; gap: 14px; text-align: left; font: 600 16px Inter, sans-serif; color: #1B1B1F; cursor: pointer; padding: 0">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 8 2a6 6 0 0 0 3.6-1.2A1 1 0 0 1 21 3.6v10a1 1 0 0 1-.4.8A6 6 0 0 1 17 16c-3 0-5-2-8-2a6 6 0 0 0-5 2"></path></svg>Denunciar perfil
+            </button>
+            <button onClick="{{closeMenu}}" style="min-height: 56px; border: 0; border-top: 1px solid #F0F0F5; background: transparent; display: flex; align-items: center; gap: 14px; text-align: left; font: 600 16px Inter, sans-serif; color: #C4373C; cursor: pointer; padding: 0">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m4.9 4.9 14.2 14.2"></path></svg>Bloquear Lucas
+            </button>
+            <div style="font-size: 12px; line-height: 18px; color: #6B6B76; padding: 0 0 8px 36px; margin-top: -8px">Ele não vai saber. Vocês param de ver o perfil um do outro.</div>
+            <button onClick="{{closeMenu}}" style="height: 48px; border: 0; background: transparent; color: #5B5BD6; font: 600 16px Inter, sans-serif; cursor: pointer; margin-top: 4px">Cancelar</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{menuReport}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 20px; line-height: 26px">Por que você quer denunciar?</div>
+            <div style="font-size: 14px; line-height: 20px; color: #6B6B76">Sua denúncia é anônima. Nossa equipe analisa em até 24h.</div>
+            <div role="radiogroup" aria-label="Motivo" style="display: flex; flex-direction: column; padding-top: 4px">
+              <sc-for list="{{reasons}}" as="r" hint-placeholder-count="5">
+                <label style="min-height: 48px; display: flex; align-items: center; gap: 12px; font-size: 16px; cursor: pointer">
+                  <input type="radio" name="motivo" checked="{{r.on}}" onChange="{{r.pick}}" style="width: 20px; height: 20px; margin: 0; accent-color: #5B5BD6">{{r.label}}
+                </label>
+              </sc-for>
+            </div>
+            <button class="press" onClick="{{closeMenu}}" style="height: 52px; border: 0; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; cursor: pointer; margin-top: 8px">Enviar denúncia</button>
+            <button onClick="{{closeMenu}}" style="height: 48px; border: 0; background: transparent; color: #5B5BD6; font: 600 16px Inter, sans-serif; cursor: pointer">Cancelar</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1640}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { following: true, menu: '', reason: 'Golpe ou vaga falsa' }; }
+  renderVals() {
+    const s = this.state;
+    const f = s.following;
+    return {
+      following: f,
+      followers: f ? 48 : 47,
+      fLabel: f ? 'Seguindo' : 'Seguir',
+      fBg: f ? '#FFFFFF' : '#5B5BD6', fColor: f ? '#1B1B1F' : '#FFFFFF', fBorder: f ? '#E8E8F0' : '#5B5BD6',
+      toggleFollow: () => this.setState({ following: !f }),
+      menu: s.menu !== '', menuMain: s.menu === 'main', menuReport: s.menu === 'report',
+      openMenu: () => this.setState({ menu: 'main' }),
+      toReport: () => this.setState({ menu: 'report' }),
+      closeMenu: () => this.setState({ menu: '' }),
+      reasons: ['Perfil falso', 'Assédio ou ofensa', 'Golpe ou vaga falsa', 'Conteúdo impróprio', 'Outro motivo'].map((r) => ({ label: r, on: r === s.reason, pick: () => this.setState({ reason: r }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

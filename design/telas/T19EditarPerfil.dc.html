@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Editar perfil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F7F7FB}
+a{color:#5B5BD6}
+.press{transition:transform 180ms ease-out}.press:active{transform:scale(.97)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#5B5BD6 !important;box-shadow:0 0 0 1px #5B5BD6}
+:focus-visible{outline:2px solid #5B5BD6;outline-offset:2px}
+.chip{transition:background-color 150ms ease-out,color 150ms ease-out}
+</style>
+</helmet>
+<div style="width: 390px; height: 2800px; box-sizing: border-box; background: #F7F7FB; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #1B1B1F">
+  <div style="padding: 52px 20px 0 8px; display: flex; align-items: center; gap: 4px">
+    <a href="T18MeuPerfil.dc.html" aria-label="Voltar sem salvar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #1B1B1F"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></a>
+    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 20px; line-height: 26px">Editar perfil</h1>
+  </div>
+
+  <div style="flex-grow: 1; padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 28px">
+
+    <section aria-labelledby="foto-t" style="display: flex; align-items: center; gap: 16px">
+      <div style="position: relative; width: 88px; height: 88px; flex-shrink: 0">
+        <sc-if value="{{hasPhoto}}" hint-placeholder-val="{{ true }}">
+          <div role="img" aria-label="Sua foto" style="width: 88px; height: 88px; border-radius: 999px; overflow: hidden"><svg width="88" height="88" viewBox="0 0 96 96" aria-hidden="true"><rect width="96" height="96" fill="#C9C9F4"></rect><circle cx="48" cy="38" r="17" fill="#5B5BD6"></circle><path d="M14 96c4-20 18-30 34-30s30 10 34 30z" fill="#5B5BD6"></path></svg></div>
+        </sc-if>
+        <sc-if value="{{noPhoto}}" hint-placeholder-val="{{ false }}">
+          <div aria-label="Sem foto" style="width: 88px; height: 88px; border-radius: 999px; background: #EEEEFC; color: #4747B8; display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 28px">AS</div>
+        </sc-if>
+        <button onClick="{{addPhoto}}" aria-label="Trocar foto" style="position: absolute; right: -4px; bottom: -4px; width: 40px; height: 40px; border-radius: 999px; border: 3px solid #F7F7FB; background: #5B5BD6; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer; box-sizing: border-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+        </button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div id="foto-t" style="font-weight: 600; font-size: 16px; line-height: 22px">Foto de perfil</div>
+        <div style="font-size: 14px; line-height: 20px; color: #6B6B76">Rosto visível e fundo simples. Pode ser do celular.</div>
+        <sc-if value="{{hasPhoto}}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{removePhoto}}" style="align-self: flex-start; min-height: 36px; padding: 0; border: 0; background: transparent; color: #5B5BD6; font: 600 14px Inter, sans-serif; cursor: pointer">Remover foto</button>
+        </sc-if>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="nome" style="font-size: 14px; line-height: 20px; font-weight: 600">Nome</label>
+        <input id="nome" value="Ana Souza" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="titulo" style="font-size: 14px; line-height: 20px; font-weight: 600">Título</label>
+        <input id="titulo" value="{{headline}}" onChange="{{onHeadline}}" maxlength="120" aria-describedby="titulo-h" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+        <div id="titulo-h" style="display: flex; justify-content: space-between; font-size: 12px; line-height: 16px; color: #6B6B76"><span>O que você é e o que busca, em uma linha.</span><span>{{headlineLen}}/120</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="cidade" style="font-size: 14px; line-height: 20px; font-weight: 600">Cidade</label>
+        <input id="cidade" value="São Paulo, SP" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <label for="bio" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Sobre mim</label>
+      <div style="font-size: 14px; line-height: 20px; color: #6B6B76">Três frases: quem você é, o que já fez e o que busca.</div>
+      <div style="position: relative">
+        <textarea id="bio" rows="6" maxlength="400" value="{{bio}}" onChange="{{onBio}}" style="width: 100%; box-sizing: border-box; padding: 14px 16px 32px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px/24px Inter, sans-serif; color: #1B1B1F; resize: none; background: #FFFFFF"></textarea>
+        <span style="position: absolute; right: 14px; bottom: 12px; font-size: 12px; line-height: 16px; color: #6B6B76">{{bioLen}}/400</span>
+      </div>
+      <button class="press" onClick="{{helpBio}}" style="align-self: flex-start; height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: #EEEEFC; color: #4747B8; font: 600 14px Inter, sans-serif; display: flex; align-items: center; gap: 6px; cursor: pointer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path></svg>{{helpLabel}}
+      </button>
+    </section>
+
+    <section aria-labelledby="comp-t" style="display: flex; flex-direction: column; gap: 12px">
+      <div id="comp-t" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Competências</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{skills}}" as="k" hint-placeholder-count="6">
+          <span style="height: 40px; padding: 0 4px 0 14px; border-radius: 999px; background: #5B5BD6; color: #FFFFFF; display: inline-flex; align-items: center; gap: 2px; font: 600 14px Inter, sans-serif">
+            {{k.label}}
+            <button onClick="{{k.remove}}" aria-label="Remover {{k.label}}" style="width: 32px; height: 32px; border: 0; border-radius: 999px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+          </span>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <label for="nova-comp" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Nova competência</label>
+        <input id="nova-comp" value="{{draft}}" onChange="{{onDraft}}" placeholder="Adicionar competência" style="flex-grow: 1; min-width: 0; height: 48px; box-sizing: border-box; padding: 0 14px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+        <button class="press" onClick="{{addDraft}}" aria-label="Adicionar" style="width: 48px; height: 48px; border: 0; border-radius: 14px; background: #EEEEFC; color: #4747B8; font: 600 22px Inter, sans-serif; cursor: pointer">+</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #6B6B76">SUGESTÕES PARA ATENDIMENTO</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{suggestions}}" as="g" hint-placeholder-count="4">
+            <button class="chip" onClick="{{g.add}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px dashed #C9C9DC; background: #FFFFFF; color: #1B1B1F; font: 500 14px Inter, sans-serif; cursor: pointer">+ {{g.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="obj-t" style="display: flex; flex-direction: column; gap: 12px">
+      <div id="obj-t" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">O que você busca</div>
+      <div role="radiogroup" aria-label="Objetivo" style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{goals}}" as="x" hint-placeholder-count="4">
+          <button class="chip" role="radio" aria-checked="{{x.on}}" onClick="{{x.pick}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{x.border}}; background: {{x.bg}}; color: {{x.color}}; font: 500 14px Inter, sans-serif; cursor: pointer">{{x.label}}</button>
+        </sc-for>
+      </div>
+      <div style="font-size: 14px; line-height: 20px; font-weight: 600; padding-top: 4px">Disponibilidade <span style="font-weight: 400; color: #6B6B76">(pode escolher várias)</span></div>
+      <div role="group" aria-label="Disponibilidade" style="display: flex; flex-wrap: wrap; gap: 8px">
+        <sc-for list="{{avail}}" as="x" hint-placeholder-count="4">
+          <button class="chip" aria-pressed="{{x.on}}" onClick="{{x.pick}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{x.border}}; background: {{x.bg}}; color: {{x.color}}; font: 500 14px Inter, sans-serif; cursor: pointer">{{x.label}}</button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-labelledby="exp-t" style="display: flex; flex-direction: column; gap: 10px">
+      <div id="exp-t" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Experiências</div>
+      <div style="font-size: 14px; line-height: 20px; color: #6B6B76">Vale voluntariado, bico, projeto da escola e ajuda em negócio da família.</div>
+      <div style="border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; overflow: hidden">
+        <a href="#exp1" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 48px; text-decoration: none; color: #1B1B1F">
+          <div style="flex-grow: 1"><div style="font-weight: 600; font-size: 15px; line-height: 21px">Voluntária · Feira de profissões</div><div style="font-size: 13px; line-height: 18px; color: #6B6B76">ETEC · ago 2026</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </a>
+        <a href="#exp2" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 48px; text-decoration: none; color: #1B1B1F; border-top: 1px solid #F0F0F5">
+          <div style="flex-grow: 1"><div style="font-weight: 600; font-size: 15px; line-height: 21px">Ajudante · Loja da família</div><div style="font-size: 13px; line-height: 18px; color: #6B6B76">2024 até hoje</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </a>
+      </div>
+      <button style="align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: transparent; color: #5B5BD6; font: 600 15px Inter, sans-serif; cursor: pointer">+ Adicionar experiência</button>
+    </section>
+
+    <section aria-labelledby="form-t" style="display: flex; flex-direction: column; gap: 10px">
+      <div id="form-t" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Formação e cursos</div>
+      <div style="border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; overflow: hidden">
+        <a href="#form1" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 48px; text-decoration: none; color: #1B1B1F">
+          <div style="flex-grow: 1"><div style="font-weight: 600; font-size: 15px; line-height: 21px">Técnico em Administração</div><div style="font-size: 13px; line-height: 18px; color: #6B6B76">ETEC · conclusão em 2027</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </a>
+        <a href="#form2" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 48px; text-decoration: none; color: #1B1B1F; border-top: 1px solid #F0F0F5">
+          <div style="flex-grow: 1"><div style="font-weight: 600; font-size: 15px; line-height: 21px">Ensino médio</div><div style="font-size: 13px; line-height: 18px; color: #6B6B76">Concluído em 2025</div></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6B76" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </a>
+      </div>
+      <div style="display: flex; gap: 20px">
+        <button style="min-height: 44px; padding: 0; border: 0; background: transparent; color: #5B5BD6; font: 600 15px Inter, sans-serif; cursor: pointer">+ Formação</button>
+        <button style="min-height: 44px; padding: 0; border: 0; background: transparent; color: #5B5BD6; font: 600 15px Inter, sans-serif; cursor: pointer">+ Curso ou certificado</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="lang-t" style="display: flex; flex-direction: column; gap: 10px">
+      <div id="lang-t" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Idiomas</div>
+      <div style="border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; overflow: hidden">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 8px 16px">
+          <label for="l-pt" style="font-size: 15px; font-weight: 600">Português</label>
+          <select id="l-pt" style="height: 44px; padding: 0 10px; border: 1px solid #E8E8F0; border-radius: 12px; font: 500 15px Inter, sans-serif; color: #1B1B1F; background: #F7F7FB"><option>Básico</option><option>Intermediário</option><option>Avançado</option><option selected="">Nativo</option></select>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 8px 16px; border-top: 1px solid #F0F0F5">
+          <label for="l-en" style="font-size: 15px; font-weight: 600">Inglês</label>
+          <select id="l-en" style="height: 44px; padding: 0 10px; border: 1px solid #E8E8F0; border-radius: 12px; font: 500 15px Inter, sans-serif; color: #1B1B1F; background: #F7F7FB"><option selected="">Básico</option><option>Intermediário</option><option>Avançado</option><option>Fluente</option></select>
+        </div>
+      </div>
+      <button style="align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: transparent; color: #5B5BD6; font: 600 15px Inter, sans-serif; cursor: pointer">+ Adicionar idioma</button>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Links</div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="lk" style="font-size: 14px; line-height: 20px; font-weight: 600">LinkedIn</label>
+        <input id="lk" type="url" value="linkedin.com/in/anasouza" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="pf" style="font-size: 14px; line-height: 20px; font-weight: 600">Portfólio ou outro link <span style="font-weight: 400; color: #6B6B76">(opcional)</span></label>
+        <input id="pf" type="url" placeholder="https://" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #E8E8F0; border-radius: 14px; font: 400 16px Inter, sans-serif; color: #1B1B1F; background: #FFFFFF">
+      </div>
+    </section>
+
+    <section aria-labelledby="priv-t" style="display: flex; flex-direction: column; gap: 12px">
+      <div id="priv-t" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 18px; line-height: 24px">Privacidade</div>
+      <div style="padding: 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E8E8F0; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="flex-grow: 1"><div id="pub-l" style="font-weight: 600; font-size: 16px; line-height: 22px">Aparecer no Explorar</div><div style="font-size: 14px; line-height: 20px; color: #6B6B76">Outras pessoas podem encontrar e ver seu perfil.</div></div>
+          <button role="switch" aria-checked="{{pub}}" aria-labelledby="pub-l" onClick="{{togglePub}}" style="width: 52px; height: 32px; border: 0; border-radius: 999px; background: {{pubBg}}; padding: 3px; cursor: pointer; display: flex; flex-shrink: 0">
+            <span style="width: 26px; height: 26px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transform: {{pubKnob}}; transition: transform 180ms ease-out"></span>
+          </button>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 18px; color: #6B6B76; padding-top: 14px; border-top: 1px solid #F0F0F5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+          E-mail, idade e notas das simulações nunca aparecem para outras pessoas.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div style="padding: 16px 20px 32px; background: #F7F7FB; border-top: 1px solid #E8E8F0">
+    <a class="press" href="T18MeuPerfil.dc.html" style="height: 52px; border-radius: 14px; background: #5B5BD6; color: #FFFFFF; font: 600 16px Inter, sans-serif; display: flex; align-items: center; justify-content: center; text-decoration: none">Salvar alterações</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      photo: true,
+      headline: 'Estudante de Administração · Em busca do primeiro emprego em Atendimento',
+      bio: 'Tenho 19 anos e estou terminando o técnico em Administração. Gosto de ajudar pessoas.',
+      helped: false,
+      skills: ['Comunicação', 'Empatia', 'Organização', 'Trabalho em equipe', 'Pacote Office', 'Excel básico'],
+      draft: '',
+      goal: 'Primeiro emprego',
+      avail: ['Manhã', 'Tarde'],
+      pub: true,
+      msg: 'Quem eu sigo'
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const chip = (on) => on
+      ? { on: true, bg: '#5B5BD6', color: '#FFFFFF', border: '#5B5BD6' }
+      : { on: false, bg: '#FFFFFF', color: '#1B1B1F', border: '#E8E8F0' };
+    const suggested = ['Pontualidade', 'Atendimento ao cliente', 'Resolução de problemas', 'Digitação', 'Paciência'].filter((x) => !s.skills.includes(x)).slice(0, 4);
+    const betterBio = 'Tenho 19 anos e estou terminando o técnico em Administração. Na feira de profissões da escola, cuidei do atendimento aos visitantes e descobri que gosto de resolver dúvidas. Quero começar minha carreira em atendimento ao cliente.';
+    return {
+      hasPhoto: s.photo, noPhoto: !s.photo,
+      addPhoto: () => this.setState({ photo: true }),
+      removePhoto: () => this.setState({ photo: false }),
+      headline: s.headline, headlineLen: s.headline.length,
+      onHeadline: (e) => this.setState({ headline: e.target.value }),
+      bio: s.bio, bioLen: s.bio.length,
+      onBio: (e) => this.setState({ bio: e.target.value }),
+      helpLabel: s.helped ? 'Sugestão aplicada · editar à vontade' : 'Me ajude a escrever',
+      helpBio: () => this.setState({ bio: betterBio, helped: true }),
+      skills: s.skills.map((k) => ({ label: k, remove: () => this.setState({ skills: s.skills.filter((x) => x !== k) }) })),
+      draft: s.draft,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      addDraft: () => { const d = s.draft.trim(); if (d && !s.skills.includes(d)) this.setState({ skills: s.skills.concat(d), draft: '' }); },
+      suggestions: suggested.map((g) => ({ label: g, add: () => this.setState({ skills: s.skills.concat(g) }) })),
+      goals: ['Jovem aprendiz', 'Estágio', 'Primeiro emprego', 'Novo emprego'].map((g) => ({ label: g, ...chip(g === s.goal), pick: () => this.setState({ goal: g }) })),
+      avail: ['Manhã', 'Tarde', 'Noite', 'Fim de semana'].map((g) => {
+        const on = s.avail.includes(g);
+        return { label: g, ...chip(on), pick: () => this.setState({ avail: on ? s.avail.filter((x) => x !== g) : s.avail.concat(g) }) };
+      }),
+      pub: s.pub,
+      togglePub: () => this.setState({ pub: !s.pub }),
+      pubBg: s.pub ? '#5B5BD6' : '#C9C9D6',
+      pubKnob: s.pub ? 'translateX(20px)' : 'none',
+      msgOpts: ['Ninguém', 'Quem eu sigo', 'Todos'].map((m) => {
+        const on = m === s.msg;
+        return { label: m, on, bg: on ? '#FFFFFF' : 'transparent', color: on ? '#1B1B1F' : '#6B6B76', sh: on ? '0 1px 4px rgba(27,27,31,0.08)' : 'none', pick: () => this.setState({ msg: m }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
