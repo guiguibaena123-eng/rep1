@@ -16,6 +16,8 @@ import {
 import { useDrafts } from '@/features/interview/draft';
 import { DEFAULT_QUESTION_COUNT, MINUTES_PER_QUESTION, levelFromGoal } from '@/features/interview/types';
 import { useLinkedInReports } from '@/features/linkedin/api';
+import { NotificationBell } from '@/features/notifications/components';
+import { useTodayReminders } from '@/features/notifications/reminders';
 import { openPremium } from '@/features/plan/navigation';
 import { usePreferences } from '@/features/preferences/store';
 import { useProfile } from '@/features/profile/api';
@@ -67,6 +69,7 @@ export default function HomeTab() {
   const lastStep = useLastNextStep();
   const linkedin = useLinkedInReports();
   const nextStep = lastStep.data ?? null;
+  const reminders = useTodayReminders();
 
   const p = profile.data;
   const linkedinNew = linkedin.data?.length === 0;
@@ -132,7 +135,7 @@ export default function HomeTab() {
   };
 
   return (
-    <Screen brand refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />}>
+    <Screen brand brandRight={<NotificationBell extra={reminders.length} />} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />}>
       <View style={styles.hello}>
         {/* Sem o perfil ainda: bloco pulsando em vez de "Oi! 👋" sem nome que depois troca. */}
         {profile.isPending ? (

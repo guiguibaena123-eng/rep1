@@ -131,7 +131,9 @@ describe('linhas do card', () => {
   it('shortLine e placeLine pulam o que falta', () => {
     expect(shortLine(person())).toBe('');
     expect(shortLine(person({ goal: 'estagio', area: 'outra' }))).toBe(t.options.goal.estagio);
-    expect(placeLine(person({ city: ' Guarulhos, SP ', area: firstArea }))).toBe(`Guarulhos, SP · ${t.options.area[firstArea]}`);
+    expect(placeLine(person({ city: ' Guarulhos, SP ', area: firstArea }))).toBe(
+      `Guarulhos, SP · ${t.options.area[firstArea]}`,
+    );
   });
 
   it('topSkills devolve até 2 nomes', () => {

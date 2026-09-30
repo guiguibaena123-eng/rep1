@@ -1,24 +1,18 @@
-import { router } from "expo-router";
-import { Check, Clock } from "lucide-react-native";
-import { Pressable, StyleSheet, View } from "react-native";
+import { router } from 'expo-router';
+import { Check, Clock } from 'lucide-react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Button, Text, useToast } from "@/components";
-import { useAuth } from "@/features/auth/AuthProvider";
-import { Avatar } from "@/features/profile/Avatar";
-import { VerifiedBadge } from "@/features/profile/VerifiedBadge";
-import { t } from "@/i18n";
-import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, radius, size, space } from "@/theme/tokens";
+import { Button, Text, useToast } from '@/components';
+import { useAuth } from '@/features/auth/AuthProvider';
+import { Avatar } from '@/features/profile/Avatar';
+import { VerifiedBadge } from '@/features/profile/VerifiedBadge';
+import { t } from '@/i18n';
+import { useTheme } from '@/theme/ThemeProvider';
+import { fonts, radius, size, space } from '@/theme/tokens';
 
-import { errorCode, useFollow, useRespondFollowRequest } from "./api";
-import {
-  followState,
-  nextFollowState,
-  placeLine,
-  shortLine,
-  topSkills,
-} from "./logic";
-import type { ConnectionsTab, ExplorePerson } from "./types";
+import { errorCode, useFollow, useRespondFollowRequest } from './api';
+import { followState, nextFollowState, placeLine, shortLine, topSkills } from './logic';
+import type { ConnectionsTab, ExplorePerson } from './types';
 
 const x = t.explore;
 
@@ -36,45 +30,32 @@ function useIsMe(id: string) {
  */
 export function FollowButton({
   person,
-  variant = "small",
+  variant = 'small',
 }: {
-  person: Pick<
-    ExplorePerson,
-    "id" | "name" | "is_following" | "requested" | "is_public"
-  >;
-  variant?: "small" | "card" | "large";
+  person: Pick<ExplorePerson, 'id' | 'name' | 'is_following' | 'requested' | 'is_public'>;
+  variant?: 'small' | 'card' | 'large';
 }) {
   const { colors } = useTheme();
   const toast = useToast();
   const follow = useFollow();
   const state = followState(person);
-  const active = state !== "none";
-  const height =
-    variant === "large" ? size.minTouch : variant === "card" ? 40 : 36;
+  const active = state !== 'none';
+  const height = variant === 'large' ? size.minTouch : variant === 'card' ? 40 : 36;
   const slop = Math.max(0, (size.minTouch - height) / 2);
-  const label =
-    state === "following"
-      ? x.following
-      : state === "requested"
-        ? x.requested
-        : x.follow;
-  const Icon = state === "requested" ? Clock : Check;
+  const label = state === 'following' ? x.following : state === 'requested' ? x.requested : x.follow;
+  const Icon = state === 'requested' ? Clock : Check;
 
   const press = () =>
     follow.mutate(
       { id: person.id, to: nextFollowState(state, person.is_public) },
       {
         onSuccess: (result) => {
-          if (result === "requested") toast.show(x.requestSent, "success");
+          if (result === 'requested') toast.show(x.requestSent, 'success');
         },
         onError: (err) =>
           toast.show(
-            errorCode(err) === "P0002"
-              ? x.unavailableToast
-              : active
-                ? x.unfollowError
-                : x.followError,
-            "error",
+            errorCode(err) === 'P0002' ? x.unavailableToast : active ? x.unfollowError : x.followError,
+            'error',
           ),
       },
     );
@@ -84,29 +65,27 @@ export function FollowButton({
       onPress={press}
       hitSlop={{ top: slop, bottom: slop }}
       accessibilityRole="button"
-      accessibilityLabel={x.followA11y(label, person.name?.trim() || "")}
+      accessibilityLabel={x.followA11y(label, person.name?.trim() || '')}
       accessibilityState={{ selected: active }}
       style={({ pressed }) => [
         styles.follow,
-        variant !== "small" && styles.followWide,
+        variant !== 'small' && styles.followWide,
         {
           height,
-          borderRadius: variant === "large" ? radius.button : 12,
+          borderRadius: variant === 'large' ? radius.button : 12,
           backgroundColor: active ? colors.surface : colors.primary,
           borderColor: active ? colors.border : colors.primary,
         },
         pressed && { transform: [{ scale: 0.97 }] },
       ]}
     >
-      {active && variant === "large" && (
-        <Icon size={18} color={colors.text} strokeWidth={2} />
-      )}
+      {active && variant === 'large' && <Icon size={18} color={colors.text} strokeWidth={2} />}
       <Text
         weight="semibold"
         numberOfLines={1}
         style={{
           color: active ? colors.text : colors.onPrimary,
-          fontSize: variant === "small" ? 13 : variant === "card" ? 14 : 16,
+          fontSize: variant === 'small' ? 13 : variant === 'card' ? 14 : 16,
         }}
       >
         {label}
@@ -116,20 +95,9 @@ export function FollowButton({
 }
 
 /** Nome com o selo de verificado ao lado (dourado = criador do Siwki, azul = Premium). */
-function NameLine({
-  person,
-  align,
-}: {
-  person: Pick<ExplorePerson, "name" | "verified">;
-  align?: "center";
-}) {
+function NameLine({ person, align }: { person: Pick<ExplorePerson, 'name' | 'verified'>; align?: 'center' }) {
   return (
-    <View
-      style={[
-        styles.nameLine,
-        align === "center" && { justifyContent: "center" },
-      ]}
-    >
+    <View style={[styles.nameLine, align === 'center' && { justifyContent: 'center' }]}>
       <Text
         weight="semibold"
         numberOfLines={align ? 2 : undefined}
@@ -150,22 +118,13 @@ export function PersonRow({ person }: { person: ExplorePerson }) {
   const place = placeLine(person);
   const skills = topSkills(person);
   return (
-    <View
-      style={[
-        styles.row,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-      ]}
-    >
+    <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Pressable
-        onPress={() =>
-          isMe ? router.push("/meu-perfil") : openPerson(person.id)
-        }
+        onPress={() => (isMe ? router.push('/meu-perfil') : openPerson(person.id))}
         accessibilityRole="button"
         accessibilityLabel={x.personA11y(
-          person.name ?? "",
-          [person.username && `@${person.username}`, person.headline, place]
-            .filter(Boolean)
-            .join(". "),
+          person.name ?? '',
+          [person.username && `@${person.username}`, person.headline, place].filter(Boolean).join('. '),
         )}
         style={({ pressed }) => [styles.rowMain, pressed && { opacity: 0.7 }]}
       >
@@ -173,24 +132,13 @@ export function PersonRow({ person }: { person: ExplorePerson }) {
         <View style={styles.rowText}>
           <NameLine person={person} />
           {!!person.username && (
-            <Text
-              variant="caption"
-              color="textSecondary"
-              numberOfLines={1}
-              style={{ fontFamily: fonts.body400 }}
-            >
+            <Text variant="caption" color="textSecondary" numberOfLines={1} style={{ fontFamily: fonts.body400 }}>
               {`@${person.username}`}
             </Text>
           )}
-          {!!person.headline && (
-            <Text variant="bodySmall">{person.headline}</Text>
-          )}
+          {!!person.headline && <Text variant="bodySmall">{person.headline}</Text>}
           {!!place && (
-            <Text
-              variant="caption"
-              color="textSecondary"
-              style={{ fontFamily: fonts.body400 }}
-            >
+            <Text variant="caption" color="textSecondary" style={{ fontFamily: fonts.body400 }}>
               {place}
             </Text>
           )}
@@ -230,41 +178,23 @@ export function RequestRow({ person }: { person: ExplorePerson }) {
     respond.mutate(
       { id: person.id, accept },
       {
-        onSuccess: () =>
-          toast.show(
-            accept ? t.follows.accepted : t.follows.declined,
-            "success",
-          ),
-        onError: () => toast.show(t.follows.respondError, "error"),
+        onSuccess: () => toast.show(accept ? t.follows.accepted : t.follows.declined, 'success'),
+        onError: () => toast.show(t.follows.respondError, 'error'),
       },
     );
   return (
-    <View
-      style={[
-        styles.row,
-        styles.requestRow,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-      ]}
-    >
+    <View style={[styles.row, styles.requestRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Pressable
         onPress={() => openPerson(person.id)}
         accessibilityRole="button"
-        accessibilityLabel={x.personA11y(
-          person.name ?? "",
-          person.username ? `@${person.username}` : "",
-        )}
+        accessibilityLabel={x.personA11y(person.name ?? '', person.username ? `@${person.username}` : '')}
         style={({ pressed }) => [styles.rowMain, pressed && { opacity: 0.7 }]}
       >
         <Avatar name={person.name} photoPath={person.photo_path} size={48} />
         <View style={styles.rowText}>
           <NameLine person={person} />
           {!!person.username && (
-            <Text
-              variant="caption"
-              color="textSecondary"
-              numberOfLines={1}
-              style={{ fontFamily: fonts.body400 }}
-            >
+            <Text variant="caption" color="textSecondary" numberOfLines={1} style={{ fontFamily: fonts.body400 }}>
               {`@${person.username}`}
             </Text>
           )}
@@ -272,12 +202,7 @@ export function RequestRow({ person }: { person: ExplorePerson }) {
       </Pressable>
       <View style={styles.requestActions}>
         <View style={{ flex: 1 }}>
-          <Button
-            label={t.follows.accept}
-            compact
-            onPress={() => answer(true)}
-            disabled={respond.isPending}
-          />
+          <Button label={t.follows.accept} compact onPress={() => answer(true)} disabled={respond.isPending} />
         </View>
         <View style={{ flex: 1 }}>
           <Button
@@ -311,15 +236,14 @@ export function FollowStats({
   title: string;
   requests?: number;
 }) {
-  const open = (tab: ConnectionsTab) =>
-    router.push({ pathname: "/conexoes/[id]", params: { id, tab, title } });
+  const open = (tab: ConnectionsTab) => router.push({ pathname: '/conexoes/[id]', params: { id, tab, title } });
   const items: { tab: ConnectionsTab; n: number; label: string }[] = [
-    { tab: "followers", n: followers, label: x.followersLabel(followers) },
-    { tab: "following", n: following, label: x.followingLabel },
+    { tab: 'followers', n: followers, label: x.followersLabel(followers) },
+    { tab: 'following', n: following, label: x.followingLabel },
   ];
   if (requests > 0)
     items.push({
-      tab: "requests",
+      tab: 'requests',
       n: requests,
       label: t.follows.requestsLabel(requests),
     });
@@ -351,16 +275,11 @@ export function PersonCard({ person }: { person: ExplorePerson }) {
   const { colors } = useTheme();
   const line = shortLine(person);
   return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: colors.surface, borderColor: colors.border },
-      ]}
-    >
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Pressable
         onPress={() => openPerson(person.id)}
         accessibilityRole="button"
-        accessibilityLabel={x.personA11y(person.name ?? "", line)}
+        accessibilityLabel={x.personA11y(person.name ?? '', line)}
         style={({ pressed }) => [styles.cardMain, pressed && { opacity: 0.7 }]}
       >
         <Avatar name={person.name} photoPath={person.photo_path} size={64} />
@@ -376,13 +295,7 @@ export function PersonCard({ person }: { person: ExplorePerson }) {
             {`@${person.username}`}
           </Text>
         )}
-        <Text
-          variant="caption"
-          color="textSecondary"
-          align="center"
-          numberOfLines={2}
-          style={styles.cardLine}
-        >
+        <Text variant="caption" color="textSecondary" align="center" numberOfLines={2} style={styles.cardLine}>
           {line}
         </Text>
       </Pressable>
@@ -393,20 +306,20 @@ export function PersonCard({ person }: { person: ExplorePerson }) {
 
 const styles = StyleSheet.create({
   follow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     paddingHorizontal: space[3],
     borderWidth: 1,
     flexShrink: 0,
   },
-  followWide: { alignSelf: "stretch" },
-  stats: { flexDirection: "row", flexWrap: "wrap", columnGap: space[4] },
-  stat: { minHeight: 32, justifyContent: "center" },
+  followWide: { alignSelf: 'stretch' },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space[4] },
+  stat: { minHeight: 32, justifyContent: 'center' },
   row: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: space[3],
     paddingVertical: 14,
     paddingLeft: space[4],
@@ -414,19 +327,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     borderWidth: 1,
   },
-  rowMain: { flex: 1, minWidth: 0, flexDirection: "row", gap: space[3] },
+  rowMain: { flex: 1, minWidth: 0, flexDirection: 'row', gap: space[3] },
   rowText: { flex: 1, minWidth: 0, gap: 3 },
-  nameLine: { flexDirection: "row", alignItems: "center", gap: 6 },
+  nameLine: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   shrink: { flexShrink: 1 },
   requestRow: {
-    flexDirection: "column",
-    alignItems: "stretch",
+    flexDirection: 'column',
+    alignItems: 'stretch',
     paddingRight: space[4],
   },
-  requestActions: { flexDirection: "row", gap: space[2] },
+  requestActions: { flexDirection: 'row', gap: space[2] },
   skills: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
     paddingTop: space[1],
   },
@@ -435,21 +348,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: radius.chip,
     borderWidth: 1,
-    justifyContent: "center",
-    maxWidth: "100%",
+    justifyContent: 'center',
+    maxWidth: '100%',
   },
   card: {
     width: 168,
     padding: space[4],
     borderRadius: radius.card,
     borderWidth: 1,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 10,
   },
   cardMain: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: space[2],
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
     flexGrow: 1,
   },
   cardLine: { fontFamily: fonts.body400, minHeight: 32 },

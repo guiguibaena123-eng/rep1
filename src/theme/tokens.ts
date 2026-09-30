@@ -47,9 +47,12 @@ export const lightColors = {
   toastErrorText: '#9E2A2E',
   /** Ícone da sequência de dias (âmbar mais escuro sobre warningSoft). */
   streakIcon: '#B86E00',
-  /** Selo de verificado ao lado do nome: azul = Premium; dourado = criador do app. */
+  /** Selo de verificado ao lado do nome: azul = Premium; dourado = criador do app; diamante = conta oficial. */
   verifiedBlue: '#0A5CF0',
   verifiedGold: '#C28A0E',
+  /** Diamante: a conta oficial do Siwki. */
+  verifiedDiamond: '#1E9BE8',
+  verifiedDiamondLight: '#7FE0FF',
 };
 
 export type ColorTokens = typeof lightColors;
@@ -89,6 +92,8 @@ export const darkColors: ColorTokens = {
   streakIcon: '#FFC978',
   verifiedBlue: '#4D8DFF',
   verifiedGold: '#F2B530',
+  verifiedDiamond: '#45B4F5',
+  verifiedDiamondLight: '#B8F0FF',
 };
 
 /**

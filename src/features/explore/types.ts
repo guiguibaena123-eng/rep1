@@ -1,4 +1,13 @@
-import type { Area, Availability, Course, Education, Experience, Goal, Skill, WorkFormat } from '@/features/profile/types';
+import type {
+  Area,
+  Availability,
+  Course,
+  Education,
+  Experience,
+  Goal,
+  Skill,
+  WorkFormat,
+} from '@/features/profile/types';
 import type { VerifiedKind } from '@/features/profile/verified';
 
 /**

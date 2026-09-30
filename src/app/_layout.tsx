@@ -165,6 +165,7 @@ function RootNavigator() {
           <Stack.Screen name="dicas" />
           <Stack.Screen name="pessoa" />
           <Stack.Screen name="conexoes" />
+          <Stack.Screen name="notificacoes" />
           <Stack.Screen name="meu-perfil" />
           <Stack.Screen name="configuracoes" />
           <Stack.Screen name="idioma" />

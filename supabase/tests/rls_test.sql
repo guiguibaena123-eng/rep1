@@ -399,7 +399,12 @@ begin
     raise exception 'FALHOU: B leu a tabela de denúncias';
   exception when insufficient_privilege then null;
   end;
-  ok := ok + 3;
+  begin
+    execute 'select count(*) from public.notifications';
+    raise exception 'FALHOU: B leu a tabela de notificações direto';
+  exception when insufficient_privilege then null;
+  end;
+  ok := ok + 4;
 
   update pg_temp._checks set total = total + ok;
 end $$;
@@ -416,13 +421,21 @@ declare
   ok int := 0;
 begin
   if public.follow_request_count() <> 1 then raise exception 'FALHOU: A deveria ter 1 solicitação'; end if;
+  -- Notificação do pedido: 1 não lida, do B; marcar como lida zera o número; aceitar apaga a notificação.
+  if public.notifications_unread_count() <> 1 then raise exception 'FALHOU: A deveria ter 1 notificação não lida'; end if;
+  select count(*) into n from public.notifications_list() l where l.type = 'follow_request' and l.actor_id = b and not l.is_read;
+  if n <> 1 then raise exception 'FALHOU: A deveria ver o pedido de B nas notificações'; end if;
+  perform public.notifications_mark_read();
+  if public.notifications_unread_count() <> 0 then raise exception 'FALHOU: marcar como lidas não zerou o número'; end if;
   select count(*) into n from public.follow_requests_list() r where r.id = b;
   if n <> 1 then raise exception 'FALHOU: B deveria aparecer nas solicitações de A'; end if;
   perform public.respond_follow_request(b, true);
   if public.follow_request_count() <> 0 then raise exception 'FALHOU: solicitação aceita continuou pendente'; end if;
   select count(*) into n from public.follow_list(auth.uid(), 'followers') l where l.id = b;
   if n <> 1 then raise exception 'FALHOU: B deveria virar seguidor de A ao aceitar'; end if;
-  ok := ok + 4;
+  select count(*) into n from public.notifications_list() l where l.type = 'follow_request';
+  if n <> 0 then raise exception 'FALHOU: aceitar não apagou a notificação do pedido'; end if;
+  ok := ok + 8;
   update pg_temp._checks set total = total + ok;
 end $$;
 
@@ -438,7 +451,11 @@ begin
   select count(*) into n from public.public_profile('00000000-0000-4000-a000-00000000000a') pp
   where pp.bio = 'Bio secreta de A' and pp.is_following and not pp.requested;
   if n <> 1 then raise exception 'FALHOU: seguidor aceito deveria ver o perfil completo de A'; end if;
-  update pg_temp._checks set total = total + 1;
+  select count(*) into n from public.notifications_list() l
+  where l.type = 'follow_accepted' and l.actor_id = '00000000-0000-4000-a000-00000000000a' and not l.is_read;
+  if n <> 1 then raise exception 'FALHOU: B deveria ser avisado que A aceitou'; end if;
+  if public.notifications_unread_count() <> 1 then raise exception 'FALHOU: B deveria ter 1 notificação não lida'; end if;
+  update pg_temp._checks set total = total + 3;
 end $$;
 
 -- A liga "Perfil público".
@@ -575,7 +592,10 @@ begin
   if n <> 0 then raise exception 'FALHOU: B viu fotos de A depois de bloquear'; end if;
   select count(*) into n from public.follow_requests;
   if n <> 0 then raise exception 'FALHOU: bloquear não apagou as solicitações'; end if;
-  ok := ok + 5;
+  if public.notifications_unread_count() <> 0 then raise exception 'FALHOU: bloquear não apagou as notificações'; end if;
+  select count(*) into n from public.notifications_list();
+  if n <> 0 then raise exception 'FALHOU: B ainda via notificações de quem bloqueou'; end if;
+  ok := ok + 7;
 
   update pg_temp._checks set total = total + ok;
 end $$;
@@ -633,6 +653,10 @@ begin
     'select * from public.follow_counts(gen_random_uuid())',
     'select * from public.follow_list(gen_random_uuid(), ''followers'')',
     'select public.follow_request_count()',
+    'select * from public.notifications_list()',
+    'select public.notifications_unread_count()',
+    'select public.notifications_mark_read()',
+    'select count(*) from public.notifications',
     'select * from public.follow_requests_list()',
     'select public.respond_follow_request(gen_random_uuid(), true)',
     'select count(*) from public.follow_requests',

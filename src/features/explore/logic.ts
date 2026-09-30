@@ -132,7 +132,10 @@ export function applyFollow(data: unknown, personId: string, state: FollowState)
 export function removeFromPages(data: unknown, personId: string): unknown {
   const pages = (data as InfiniteData<ExplorePerson[]> | undefined)?.pages;
   if (!Array.isArray(pages)) return data;
-  return { ...(data as InfiniteData<ExplorePerson[]>), pages: pages.map((page) => page.filter((p) => p.id !== personId)) };
+  return {
+    ...(data as InfiniteData<ExplorePerson[]>),
+    pages: pages.map((page) => page.filter((p) => p.id !== personId)),
+  };
 }
 
 /** Próxima página: só se a última veio cheia. */

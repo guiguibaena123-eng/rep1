@@ -50,6 +50,8 @@ export type ScreenProps = {
   contentStyle?: StyleProp<ViewStyle>;
   /** Maleta do Siwki no canto superior esquerdo (telas de aba). */
   brand?: boolean;
+  /** Ação no canto superior direito, na linha da maleta (ex.: sino de notificações). Só com brand. */
+  brandRight?: ReactNode;
 };
 
 /**
@@ -65,6 +67,7 @@ export function Screen({
   refreshControl,
   contentStyle,
   brand,
+  brandRight,
 }: ScreenProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -74,7 +77,14 @@ export function Screen({
   const body = [styles.content, { gap, paddingTop: top }, contentStyle];
   const content = brand ? (
     <>
-      <BrandLogo />
+      {brandRight ? (
+        <View style={styles.brandRow}>
+          <BrandLogo />
+          {brandRight}
+        </View>
+      ) : (
+        <BrandLogo />
+      )}
       {children}
     </>
   ) : (
@@ -117,6 +127,7 @@ const styles = StyleSheet.create({
   grow: { flexGrow: 1 },
   fill: { flex: 1 },
   brand: { alignSelf: 'flex-start', paddingBottom: space[1] },
+  brandRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   hidden: { opacity: 0 },
   content: { paddingHorizontal: screenPadding, paddingBottom: space[8] },
   footer: { paddingHorizontal: screenPadding, paddingTop: space[4], gap: space[1] },

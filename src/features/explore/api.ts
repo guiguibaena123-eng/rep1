@@ -1,20 +1,9 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { useAuth } from "@/features/auth/AuthProvider";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from '@/features/auth/AuthProvider';
+import { supabase } from '@/lib/supabase';
 
-import {
-  applyFollow,
-  nextOffset,
-  removeFromPages,
-  type ExploreParams,
-  type FollowState,
-} from "./logic";
+import { applyFollow, nextOffset, removeFromPages, type ExploreParams, type FollowState } from './logic';
 import {
   EXPLORE_PAGE_SIZE,
   type ExplorePerson,
@@ -23,25 +12,19 @@ import {
   type FollowResult,
   type PublicProfile,
   type ReportReason,
-} from "./types";
+} from './types';
 
 /** Todas as chaves do Explorar começam com 'explore': invalidar essa raiz recarrega tudo. */
 export const exploreKeys = {
-  all: ["explore"] as const,
-  list: (userId: string | undefined, params: ExploreParams) =>
-    ["explore", "list", userId, params] as const,
-  similar: (userId: string | undefined) =>
-    ["explore", "similar", userId] as const,
-  profile: (userId: string | undefined, id: string) =>
-    ["explore", "profile", userId, id] as const,
-  counts: (userId: string | undefined, id: string) =>
-    ["explore", "counts", userId, id] as const,
+  all: ['explore'] as const,
+  list: (userId: string | undefined, params: ExploreParams) => ['explore', 'list', userId, params] as const,
+  similar: (userId: string | undefined) => ['explore', 'similar', userId] as const,
+  profile: (userId: string | undefined, id: string) => ['explore', 'profile', userId, id] as const,
+  counts: (userId: string | undefined, id: string) => ['explore', 'counts', userId, id] as const,
   follows: (userId: string | undefined, id: string, kind: FollowKind) =>
-    ["explore", "follows", userId, id, kind] as const,
-  requests: (userId: string | undefined) =>
-    ["explore", "requests", userId] as const,
-  requestCount: (userId: string | undefined) =>
-    ["explore", "requestCount", userId] as const,
+    ['explore', 'follows', userId, id, kind] as const,
+  requests: (userId: string | undefined) => ['explore', 'requests', userId] as const,
+  requestCount: (userId: string | undefined) => ['explore', 'requestCount', userId] as const,
 };
 
 /** Código do erro que as funções do banco devolvem (PROFILE_UNAVAILABLE = P0002, LIMIT_REACHED = 54000). */
@@ -57,7 +40,7 @@ export function useExplorePeople(params: ExploreParams) {
     enabled: !!userId,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const { data, error } = await supabase.rpc("explore_profiles", {
+      const { data, error } = await supabase.rpc('explore_profiles', {
         ...params,
         p_limit: EXPLORE_PAGE_SIZE,
         p_offset: pageParam,
@@ -76,7 +59,7 @@ export function useSimilarPeople() {
     queryKey: exploreKeys.similar(userId),
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("similar_profiles", {
+      const { data, error } = await supabase.rpc('similar_profiles', {
         p_limit: 10,
       });
       if (error) throw error;
@@ -92,7 +75,7 @@ export function usePublicProfile(id: string) {
     queryKey: exploreKeys.profile(userId, id),
     enabled: !!userId && !!id,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("public_profile", {
+      const { data, error } = await supabase.rpc('public_profile', {
         p_id: id,
       });
       if (error) throw error;
@@ -110,12 +93,12 @@ export function useFollow() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, to }: { id: string; to: FollowState }) => {
-      if (to === "none") {
-        const { error } = await supabase.rpc("unfollow_user", { p_target: id });
+      if (to === 'none') {
+        const { error } = await supabase.rpc('unfollow_user', { p_target: id });
         if (error) throw error;
-        return "none" as FollowState;
+        return 'none' as FollowState;
       }
-      const { data, error } = await supabase.rpc("follow_user", {
+      const { data, error } = await supabase.rpc('follow_user', {
         p_target: id,
       });
       if (error) throw error;
@@ -124,26 +107,19 @@ export function useFollow() {
     onMutate: async ({ id, to }) => {
       await queryClient.cancelQueries({ queryKey: exploreKeys.all });
       const before = queryClient.getQueriesData({ queryKey: exploreKeys.all });
-      queryClient.setQueriesData(
-        { queryKey: exploreKeys.all },
-        (data: unknown) => applyFollow(data, id, to),
-      );
+      queryClient.setQueriesData({ queryKey: exploreKeys.all }, (data: unknown) => applyFollow(data, id, to));
       return { before };
     },
     // O perfil pode ter mudado de público para privado (ou o contrário): vale o que o banco respondeu.
     onSuccess: (result, { id, to }) => {
       if (result !== to)
-        queryClient.setQueriesData(
-          { queryKey: exploreKeys.all },
-          (data: unknown) => applyFollow(data, id, result),
-        );
+        queryClient.setQueriesData({ queryKey: exploreKeys.all }, (data: unknown) => applyFollow(data, id, result));
     },
     onError: (_err, _vars, ctx) => {
       ctx?.before.forEach(([key, data]) => queryClient.setQueryData(key, data));
     },
     // Os números ("Seguindo" do próprio perfil e "Seguidores" de quem foi seguido) vêm do banco.
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["explore", "counts"] }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['explore', 'counts'] }),
   });
 }
 
@@ -151,13 +127,12 @@ export function useFollow() {
 export function useFollowCounts(id: string | undefined) {
   const userId = useAuth().session?.user.id;
   return useQuery({
-    queryKey: exploreKeys.counts(userId, id ?? ""),
+    queryKey: exploreKeys.counts(userId, id ?? ''),
     enabled: !!userId && !!id,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("follow_counts", { p_id: id });
+      const { data, error } = await supabase.rpc('follow_counts', { p_id: id });
       if (error) throw error;
-      return ((data as FollowCounts[] | null)?.[0] ??
-        null) as FollowCounts | null;
+      return ((data as FollowCounts[] | null)?.[0] ?? null) as FollowCounts | null;
     },
   });
 }
@@ -170,7 +145,7 @@ export function useFollowList(id: string, kind: FollowKind, enabled = true) {
     enabled: !!userId && !!id && enabled,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const { data, error } = await supabase.rpc("follow_list", {
+      const { data, error } = await supabase.rpc('follow_list', {
         p_id: id,
         p_kind: kind,
         p_limit: EXPLORE_PAGE_SIZE,
@@ -191,7 +166,7 @@ export function useFollowRequests(enabled = true) {
     enabled: !!userId && enabled,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const { data, error } = await supabase.rpc("follow_requests_list", {
+      const { data, error } = await supabase.rpc('follow_requests_list', {
         p_limit: EXPLORE_PAGE_SIZE,
         p_offset: pageParam,
       });
@@ -209,7 +184,7 @@ export function useFollowRequestCount() {
     queryKey: exploreKeys.requestCount(userId),
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("follow_request_count");
+      const { data, error } = await supabase.rpc('follow_request_count');
       if (error) throw error;
       return (data as number | null) ?? 0;
     },
@@ -222,7 +197,7 @@ export function useRespondFollowRequest() {
   const userId = useAuth().session?.user.id;
   return useMutation({
     mutationFn: async ({ id, accept }: { id: string; accept: boolean }) => {
-      const { error } = await supabase.rpc("respond_follow_request", {
+      const { error } = await supabase.rpc('respond_follow_request', {
         p_requester: id,
         p_accept: accept,
       });
@@ -232,13 +207,8 @@ export function useRespondFollowRequest() {
       const key = exploreKeys.requests(userId);
       await queryClient.cancelQueries({ queryKey: key });
       const before = queryClient.getQueryData(key);
-      queryClient.setQueryData(key, (data: unknown) =>
-        removeFromPages(data, id),
-      );
-      queryClient.setQueryData(
-        exploreKeys.requestCount(userId),
-        (n: number | undefined) => Math.max(0, (n ?? 1) - 1),
-      );
+      queryClient.setQueryData(key, (data: unknown) => removeFromPages(data, id));
+      queryClient.setQueryData(exploreKeys.requestCount(userId), (n: number | undefined) => Math.max(0, (n ?? 1) - 1));
       return { before };
     },
     onError: (_err, _vars, ctx) => {
@@ -248,8 +218,8 @@ export function useRespondFollowRequest() {
       queryClient.invalidateQueries({
         queryKey: exploreKeys.requestCount(userId),
       });
-      queryClient.invalidateQueries({ queryKey: ["explore", "counts"] });
-      queryClient.invalidateQueries({ queryKey: ["explore", "follows"] });
+      queryClient.invalidateQueries({ queryKey: ['explore', 'counts'] });
+      queryClient.invalidateQueries({ queryKey: ['explore', 'follows'] });
     },
   });
 }
@@ -259,26 +229,17 @@ export function useBlock() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.rpc("block_user", { p_target: id });
+      const { error } = await supabase.rpc('block_user', { p_target: id });
       if (error) throw error;
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: exploreKeys.all }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: exploreKeys.all }),
   });
 }
 
 export function useReport() {
   return useMutation({
-    mutationFn: async ({
-      id,
-      reason,
-      detail,
-    }: {
-      id: string;
-      reason: ReportReason;
-      detail: string;
-    }) => {
-      const { error } = await supabase.rpc("report_user", {
+    mutationFn: async ({ id, reason, detail }: { id: string; reason: ReportReason; detail: string }) => {
+      const { error } = await supabase.rpc('report_user', {
         p_target: id,
         p_reason: reason,
         p_detail: detail.trim() || null,
