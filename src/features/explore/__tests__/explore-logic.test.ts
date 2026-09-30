@@ -7,8 +7,11 @@ import {
   canFilterNear,
   exploreParams,
   filterChips,
+  followState,
+  nextFollowState,
   nextOffset,
   placeLine,
+  removeFromPages,
   shortLine,
   toggleFilter,
   topSkills,
@@ -28,6 +31,9 @@ const person = (over: Partial<ExplorePerson> = {}): ExplorePerson => ({
   skills: [],
   photo_path: null,
   is_following: false,
+  requested: false,
+  is_public: true,
+  verified: null,
   ...over,
 });
 
@@ -136,28 +142,58 @@ describe('linhas do card', () => {
 
 describe('applyFollow (atualização otimista)', () => {
   it('lista simples (carrossel)', () => {
-    const out = applyFollow([person({ id: 'p1' }), person({ id: 'p2' })], 'p2', true) as ExplorePerson[];
+    const out = applyFollow([person({ id: 'p1' }), person({ id: 'p2' })], 'p2', 'following') as ExplorePerson[];
     expect(out.map((p) => p.is_following)).toEqual([false, true]);
   });
 
   it('lista paginada', () => {
     const data = { pages: [[person({ id: 'p1' })], [person({ id: 'p2' })]], pageParams: [0, 1] };
-    const out = applyFollow(data, 'p2', true) as typeof data;
+    const out = applyFollow(data, 'p2', 'following') as typeof data;
     expect(out.pages[1][0].is_following).toBe(true);
     expect(out.pages[0][0].is_following).toBe(false);
   });
 
   it('perfil aberto ajusta seguidores e nunca passa de zero', () => {
-    const profile = { id: 'p1', is_following: true, followers: 0 } as PublicProfile;
-    expect((applyFollow(profile, 'p1', false) as PublicProfile).followers).toBe(0);
-    const other = { id: 'p1', is_following: false, followers: 4 } as PublicProfile;
-    expect((applyFollow(other, 'p1', true) as PublicProfile).followers).toBe(5);
+    const profile = { id: 'p1', is_following: true, requested: false, followers: 0 } as PublicProfile;
+    expect((applyFollow(profile, 'p1', 'none') as PublicProfile).followers).toBe(0);
+    const other = { id: 'p1', is_following: false, requested: false, followers: 4 } as PublicProfile;
+    expect((applyFollow(other, 'p1', 'following') as PublicProfile).followers).toBe(5);
+  });
+
+  it('solicitação marca "requested" sem mudar seguidores', () => {
+    const profile = { id: 'p1', is_following: false, requested: false, followers: 4 } as PublicProfile;
+    const out = applyFollow(profile, 'p1', 'requested') as PublicProfile;
+    expect(out).toMatchObject({ requested: true, is_following: false, followers: 4 });
+    expect((applyFollow(out, 'p1', 'none') as PublicProfile).requested).toBe(false);
   });
 
   it('perfil de outra pessoa e cache vazio ficam como estão', () => {
-    const profile = { id: 'p9', is_following: false, followers: 1 } as PublicProfile;
-    expect(applyFollow(profile, 'p1', true)).toBe(profile);
-    expect(applyFollow(undefined, 'p1', true)).toBeUndefined();
+    const profile = { id: 'p9', is_following: false, requested: false, followers: 1 } as PublicProfile;
+    expect(applyFollow(profile, 'p1', 'following')).toBe(profile);
+    expect(applyFollow(undefined, 'p1', 'following')).toBeUndefined();
+  });
+});
+
+describe('followState e nextFollowState', () => {
+  it('lê o estado da pessoa', () => {
+    expect(followState(person())).toBe('none');
+    expect(followState(person({ requested: true }))).toBe('requested');
+    expect(followState(person({ is_following: true }))).toBe('following');
+  });
+
+  it('público segue, privado pede, e qualquer estado desfaz', () => {
+    expect(nextFollowState('none', true)).toBe('following');
+    expect(nextFollowState('none', false)).toBe('requested');
+    expect(nextFollowState('requested', false)).toBe('none');
+    expect(nextFollowState('following', true)).toBe('none');
+  });
+});
+
+describe('removeFromPages', () => {
+  it('tira a pessoa de todas as páginas', () => {
+    const data = { pages: [[person({ id: 'p1' }), person({ id: 'p2' })]], pageParams: [0] };
+    expect((removeFromPages(data, 'p1') as typeof data).pages[0].map((p) => p.id)).toEqual(['p2']);
+    expect(removeFromPages(undefined, 'p1')).toBeUndefined();
   });
 });
 

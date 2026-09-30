@@ -90,13 +90,29 @@ export function topSkills(p: Pick<ExplorePerson, 'skills'>, max = 2) {
   return (p.skills ?? []).slice(0, max).map((s) => s.name);
 }
 
+/** Relação da pessoa logada com um perfil: seguindo, solicitação pendente (perfil privado) ou nada. */
+export type FollowState = 'following' | 'requested' | 'none';
+
+/** O que o toque em Seguir faz agora: seguir um público, pedir para seguir um privado, ou desfazer. */
+export function nextFollowState(current: FollowState, isPublic: boolean): FollowState {
+  if (current !== 'none') return 'none';
+  return isPublic ? 'following' : 'requested';
+}
+
+export function followState(p: Pick<ExplorePerson, 'is_following' | 'requested'>): FollowState {
+  if (p.is_following) return 'following';
+  return p.requested ? 'requested' : 'none';
+}
+
 /**
- * Seguir/deixar de seguir no cache (atualização otimista). Funciona com os 3 formatos guardados:
+ * Seguir, pedir para seguir ou desfazer no cache (atualização otimista). Funciona com os 3 formatos guardados:
  * lista paginada do Explorar, carrossel "Com objetivos parecidos" e perfil aberto (ajusta seguidores).
  */
-export function applyFollow(data: unknown, personId: string, on: boolean): unknown {
+export function applyFollow(data: unknown, personId: string, state: FollowState): unknown {
   if (!data) return data;
-  const flip = (p: ExplorePerson) => (p.id === personId ? { ...p, is_following: on } : p);
+  const on = state === 'following';
+  const requested = state === 'requested';
+  const flip = (p: ExplorePerson) => (p.id === personId ? { ...p, is_following: on, requested } : p);
 
   if (Array.isArray(data)) return (data as ExplorePerson[]).map(flip);
 
@@ -106,10 +122,17 @@ export function applyFollow(data: unknown, personId: string, on: boolean): unkno
   }
 
   const profile = data as PublicProfile;
-  if (profile.id === personId && profile.is_following !== on) {
-    return { ...profile, is_following: on, followers: Math.max(0, profile.followers + (on ? 1 : -1)) };
-  }
-  return data;
+  if (profile.id !== personId) return data;
+  if (profile.is_following === on && !!profile.requested === requested) return data;
+  const followers = profile.is_following === on ? profile.followers : Math.max(0, profile.followers + (on ? 1 : -1));
+  return { ...profile, is_following: on, requested, followers };
+}
+
+/** Tira uma pessoa das listas paginadas (ex.: solicitação aceita ou recusada). */
+export function removeFromPages(data: unknown, personId: string): unknown {
+  const pages = (data as InfiniteData<ExplorePerson[]> | undefined)?.pages;
+  if (!Array.isArray(pages)) return data;
+  return { ...(data as InfiniteData<ExplorePerson[]>), pages: pages.map((page) => page.filter((p) => p.id !== personId)) };
 }
 
 /** Próxima página: só se a última veio cheia. */

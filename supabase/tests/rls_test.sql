@@ -337,20 +337,42 @@ declare
   n int;
   ok int := 0;
 begin
-  select count(*) into n from public.explore_profiles() where id = a;
-  if n <> 0 then raise exception 'FALHOU: perfil privado de A apareceu no Explorar'; end if;
+  -- Privado aparece só com o básico: nome e @ sim; título, área e competências não.
+  select count(*) into n from public.explore_profiles() e
+  where e.id = a and not e.is_public and e.headline is null and e.area is null and e.skills = '[]'::jsonb;
+  if n <> 1 then raise exception 'FALHOU: perfil privado de A deveria aparecer só com o básico'; end if;
+  select count(*) into n from public.explore_profiles(p_query => 'EMPATIA') where id = a;
+  if n <> 0 then raise exception 'FALHOU: busca por competência achou o perfil privado de A'; end if;
+  select count(*) into n from public.explore_profiles(p_areas => array['vendas']) where id = a;
+  if n <> 0 then raise exception 'FALHOU: filtro de área achou o perfil privado de A'; end if;
   select count(*) into n from public.similar_profiles() where id = a;
   if n <> 0 then raise exception 'FALHOU: perfil privado de A apareceu em "objetivos parecidos"'; end if;
-  select count(*) into n from public.public_profile(a);
-  if n <> 0 then raise exception 'FALHOU: B abriu o perfil privado de A'; end if;
-  select count(*) into n from storage.objects where name like a::text || '/%';
-  if n <> 0 then raise exception 'FALHOU: B viu a foto de A com o perfil privado'; end if;
+  select count(*) into n from public.public_profile(a) pp
+  where pp.name = 'Pessoa A' and pp.bio is null and pp.experiences = '[]'::jsonb and not pp.linkedin_done and not pp.is_public;
+  if n <> 1 then raise exception 'FALHOU: perfil privado de A abriu além do básico'; end if;
+  select count(*) into n from storage.objects where name in (a::text || '/avatar-1.jpg', a::text || '/cover-1.jpg');
+  if n <> 2 then raise exception 'FALHOU: B deveria ver foto e capa atuais de A privado (viu %)', n; end if;
+  ok := ok + 6;
+
+  -- Seguir um privado vira solicitação (não segue ainda).
+  if public.follow_user(a) is distinct from 'requested' then raise exception 'FALHOU: seguir privado deveria virar solicitação'; end if;
+  select count(*) into n from public.follows;
+  if n <> 0 then raise exception 'FALHOU: B passou a seguir A sem aceite'; end if;
+  select count(*) into n from public.follow_requests where requester_id = b and target_id = a;
+  if n <> 1 then raise exception 'FALHOU: solicitação de B para A não foi criada'; end if;
+  select count(*) into n from public.public_profile(a) pp where pp.requested;
+  if n <> 1 then raise exception 'FALHOU: perfil de A deveria mostrar "Solicitado"'; end if;
+  if public.follow_request_count() <> 0 then raise exception 'FALHOU: B viu solicitações que não são dele'; end if;
+  -- Responder por outra pessoa não faz nada.
+  perform public.respond_follow_request(a, true);
+  select count(*) into n from public.follows;
+  if n <> 0 then raise exception 'FALHOU: B aceitou a própria solicitação'; end if;
   begin
-    perform public.follow_user(a);
-    raise exception 'FALHOU: B seguiu um perfil privado';
-  exception when sqlstate 'P0002' then null;
+    insert into public.follow_requests (requester_id, target_id) values (a, b);
+    raise exception 'FALHOU: B gravou direto em follow_requests';
+  exception when insufficient_privilege then null;
   end;
-  ok := ok + 5;
+  ok := ok + 7;
 
   -- B liga o próprio "Aparecer no Explorar", mas não o de A.
   update public.profiles set is_public = true where id = b;
@@ -382,7 +404,44 @@ begin
   update pg_temp._checks set total = total + ok;
 end $$;
 
--- A liga "Aparecer no Explorar".
+-- ---------- Como A: vê a solicitação de B e aceita ----------
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-00000000000a","role":"authenticated"}', true);
+
+do $$
+declare
+  b constant uuid := '00000000-0000-4000-a000-00000000000b';
+  n int;
+  ok int := 0;
+begin
+  if public.follow_request_count() <> 1 then raise exception 'FALHOU: A deveria ter 1 solicitação'; end if;
+  select count(*) into n from public.follow_requests_list() r where r.id = b;
+  if n <> 1 then raise exception 'FALHOU: B deveria aparecer nas solicitações de A'; end if;
+  perform public.respond_follow_request(b, true);
+  if public.follow_request_count() <> 0 then raise exception 'FALHOU: solicitação aceita continuou pendente'; end if;
+  select count(*) into n from public.follow_list(auth.uid(), 'followers') l where l.id = b;
+  if n <> 1 then raise exception 'FALHOU: B deveria virar seguidor de A ao aceitar'; end if;
+  ok := ok + 4;
+  update pg_temp._checks set total = total + ok;
+end $$;
+
+-- Como B: seguindo A (aceito), vê o perfil completo mesmo com A privado.
+reset role;
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-a000-00000000000b","role":"authenticated"}', true);
+
+do $$
+declare
+  n int;
+begin
+  select count(*) into n from public.public_profile('00000000-0000-4000-a000-00000000000a') pp
+  where pp.bio = 'Bio secreta de A' and pp.is_following and not pp.requested;
+  if n <> 1 then raise exception 'FALHOU: seguidor aceito deveria ver o perfil completo de A'; end if;
+  update pg_temp._checks set total = total + 1;
+end $$;
+
+-- A liga "Perfil público".
 reset role;
 update public.profiles set is_public = true where id = '00000000-0000-4000-a000-00000000000a';
 
@@ -514,7 +573,9 @@ begin
   if n <> 0 then raise exception 'FALHOU: bloquear não desfez o seguir'; end if;
   select count(*) into n from storage.objects where name like a::text || '/%';
   if n <> 0 then raise exception 'FALHOU: B viu fotos de A depois de bloquear'; end if;
-  ok := ok + 4;
+  select count(*) into n from public.follow_requests;
+  if n <> 0 then raise exception 'FALHOU: bloquear não apagou as solicitações'; end if;
+  ok := ok + 5;
 
   update pg_temp._checks set total = total + ok;
 end $$;
@@ -571,6 +632,10 @@ begin
     'select public.username_available(''ana'')',
     'select * from public.follow_counts(gen_random_uuid())',
     'select * from public.follow_list(gen_random_uuid(), ''followers'')',
+    'select public.follow_request_count()',
+    'select * from public.follow_requests_list()',
+    'select public.respond_follow_request(gen_random_uuid(), true)',
+    'select count(*) from public.follow_requests',
     'select count(*) from public.follows',
     'select count(*) from public.reports'
   ] loop

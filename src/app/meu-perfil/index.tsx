@@ -24,7 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, LoadingScreen, ProgressBar, ScoreRing, Text, useToast } from '@/components';
 import { ErrorScreen } from '@/components/ErrorScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useFollowCounts } from '@/features/explore/api';
+import { useFollowCounts, useFollowRequestCount } from '@/features/explore/api';
 import { FollowStats } from '@/features/explore/components';
 import { useLinkedInReports } from '@/features/linkedin/api';
 import { useProfile, useStrengths, useUpdateProfile } from '@/features/profile/api';
@@ -63,6 +63,7 @@ export default function MyProfileScreen() {
   const profile = useProfile();
   const userId = useAuth().session?.user.id;
   const counts = useFollowCounts(userId).data;
+  const requests = useFollowRequestCount().data ?? 0;
 
   if (profile.isPending) return <LoadingScreen />;
   if (!profile.data) {
@@ -103,6 +104,7 @@ export default function MyProfileScreen() {
                 followers={counts.followers}
                 following={counts.following}
                 title={d.username ? `@${d.username}` : (d.name ?? '')}
+                requests={requests}
               />
             )}
           </View>
