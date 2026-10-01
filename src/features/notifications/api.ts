@@ -1,4 +1,5 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 
 import { useAuth } from '@/features/auth/AuthProvider';
 import { nextOffset } from '@/features/explore/logic';
@@ -45,6 +46,17 @@ export function useUnreadCount() {
       return (data as number | null) ?? 0;
     },
   });
+}
+
+/** Ao sair da tela, a lista em cache passa a "lida" (senão reabrir logo depois mostraria o destaque de novo). */
+export function useSettleListOnLeave() {
+  const queryClient = useQueryClient();
+  const userId = useAuth().session?.user.id;
+  return useCallback(() => {
+    queryClient.setQueryData<InfiniteData<AppNotification[]>>(notificationKeys.list(userId), (old) =>
+      old && { ...old, pages: old.pages.map((p) => p.map((i) => (i.is_read ? i : { ...i, is_read: true }))) },
+    );
+  }, [queryClient, userId]);
 }
 
 /** Marca tudo como lido. Só o número do sino é atualizado; a lista na tela mantém o destaque até sair. */

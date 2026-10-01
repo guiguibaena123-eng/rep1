@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, EmptyState, ScreenHeader, SkeletonCard, Text } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { usePendingSession } from '@/features/interview/api';
-import { useMarkAllRead, useNotifications } from '@/features/notifications/api';
+import { useMarkAllRead, useNotifications, useSettleListOnLeave } from '@/features/notifications/api';
 import { timeAgo } from '@/features/notifications/logic';
 import { useTodayReminders } from '@/features/notifications/reminders';
 import type { AppNotification, LocalReminder } from '@/features/notifications/types';
@@ -48,6 +48,10 @@ export default function NotificationsScreen() {
   useEffect(() => {
     if (hasUnread) markRead();
   }, [hasUnread, markRead]);
+
+  // Ao sair, o cache vira "lido": reabrir logo depois não mostra o destaque de novo.
+  const settleOnLeave = useSettleListOnLeave();
+  useEffect(() => settleOnLeave, [settleOnLeave]);
 
   const openReminder = (r: LocalReminder) => {
     if (r.kind === 'pending' && pending.data) {
