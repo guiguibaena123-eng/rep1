@@ -97,17 +97,19 @@ function Result({ data }: { data: InterviewResult }) {
           </Text>
         </View>
 
-        <View style={[styles.box, { backgroundColor: colors.successSoft }]}>
-          <Text variant="sectionTitle" accessibilityRole="header">
-            {r.good}
-          </Text>
-          {report.strengths.map((item, i) => (
-            <View key={i} style={styles.bullet}>
-              <Check size={22} color={colors.successInk} strokeWidth={2} style={{ marginTop: 1 }} />
-              <Text style={styles.flex}>{item}</Text>
-            </View>
-          ))}
-        </View>
+        {report.strengths.length > 0 && (
+          <View style={[styles.box, { backgroundColor: colors.successSoft }]}>
+            <Text variant="sectionTitle" accessibilityRole="header">
+              {r.good}
+            </Text>
+            {report.strengths.map((item, i) => (
+              <View key={i} style={styles.bullet}>
+                <Check size={22} color={colors.successInk} strokeWidth={2} style={{ marginTop: 1 }} />
+                <Text style={styles.flex}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         {report.improvements.length > 0 && (
           <View style={[styles.box, { backgroundColor: colors.primarySoft, gap: space[1] }]}>
@@ -204,6 +206,7 @@ function Result({ data }: { data: InterviewResult }) {
                       </Text>
                     </View>
                     <Text variant="bodySmall">{review.comment}</Text>
+                    {review.suggested_answer !== '' && (
                     <View style={[styles.suggested, { backgroundColor: colors.primarySoft }]}>
                       <Text variant="caption" weight="semibold" color="primaryInk">
                         {r.suggested}
@@ -223,6 +226,7 @@ function Result({ data }: { data: InterviewResult }) {
                         </Text>
                       </Pressable>
                     </View>
+                    )}
                   </View>
                 )}
               </View>

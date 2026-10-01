@@ -99,6 +99,46 @@ describe('parseFeedback', () => {
     expect(parseFeedback(incomplete, questions)).toBeNull();
   });
 
+  it('aceita notas escritas como texto ("72/100", "7,5 de 10")', () => {
+    const result = parseFeedback(
+      { ...feedback, overall_score: '72/100', answer_reviews: feedback.answer_reviews.map((r) => ({ ...r, score: '7,5 de 10' })) },
+      questions,
+    );
+    expect(result?.overall_score).toBe(72);
+    expect(result?.answer_reviews[0].score).toBe(8);
+  });
+
+  it('nota geral por extenso ("thirty") vira a média das notas das respostas', () => {
+    // As notas das respostas são 7 e 8: média 7,5 → 75.
+    expect(parseFeedback({ ...feedback, overall_score: 'thirty' }, questions)?.overall_score).toBe(75);
+    const { overall_score: _o, ...semNota } = feedback;
+    expect(parseFeedback(semNota, questions)?.overall_score).toBe(75);
+  });
+
+  it('aceita ids em outro formato ("Q1", "1") e ids fora do padrão pela ordem', () => {
+    const odd = parseFeedback({ ...feedback, answer_reviews: [{ ...feedback.answer_reviews[1], question_id: 'Q1' }, { ...feedback.answer_reviews[0], question_id: '2' }] }, questions);
+    expect(odd?.answer_reviews.map((r) => r.comment)).toEqual(['Boa', 'Ok']);
+    const byOrder = parseFeedback(
+      { ...feedback, answer_reviews: [{ ...feedback.answer_reviews[1], question_id: 'pergunta-a' }, { ...feedback.answer_reviews[0], question_id: 'pergunta-b' }] },
+      questions,
+    );
+    expect(byOrder?.answer_reviews.map((r) => r.question_id)).toEqual(['q1', 'q2']);
+  });
+
+  it('não perde o feedback quando a IA deixa vazio um campo de apoio', () => {
+    const result = parseFeedback(
+      {
+        ...feedback,
+        strengths: [],
+        improvements: [{ point: 'Exemplos', why: null, how: '' }],
+        answer_reviews: feedback.answer_reviews.map((r) => ({ ...r, suggested_answer: null })),
+      },
+      questions,
+    );
+    expect(result?.strengths).toEqual([]);
+    expect(result?.answer_reviews[0].suggested_answer).toBe('');
+  });
+
   it('aceita sem vícios de linguagem (vira lista vazia)', () => {
     const { filler_words_detected: _f, ...rest } = feedback;
     expect(parseFeedback(rest, questions)?.filler_words_detected).toEqual([]);

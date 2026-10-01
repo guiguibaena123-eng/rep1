@@ -117,7 +117,7 @@ Regras:
 - Inclua um item em "answer_reviews" para CADA question_id recebido.
 Responda APENAS com JSON no formato:
 {
- "overall_score": 0-100,
+ "overall_score": número inteiro de 0 a 100, escrito em dígitos (ex.: 65), nunca por extenso,
  "summary": "2 a 3 frases",
  "encouragement": "1 frase gentil",
  "strengths": ["..."],
@@ -180,43 +180,63 @@ export function parseQuestions(raw: unknown, expected: number): Question[] | nul
   return list.map((q, i) => ({ id: `q${i + 1}`, text: q.text, hint: clip(q.hint, HINT_MAX) }));
 }
 
+/** A IA às vezes manda a nota como texto ("45", "45/100", "7,5 de 10"): pegamos o primeiro número. */
+const toNumber = (v: unknown) => {
+  if (typeof v !== 'string') return v;
+  const found = v.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+  return found ? Number(found[0]) : Number.NaN;
+};
+
 const clampInt = (min: number, max: number) =>
-  z.coerce
-    .number()
-    .refine((n) => Number.isFinite(n))
-    .transform((n) => Math.round(Math.min(max, Math.max(min, n))));
+  z.preprocess(toNumber, z.number().refine((n) => Number.isFinite(n))).transform((n) => Math.round(Math.min(max, Math.max(min, n))));
 
 const text = z.string().trim().min(1);
+// Campos de apoio: se a IA deixar vazio ou nulo, seguimos com texto vazio em vez de perder o feedback inteiro.
+const softText = z.preprocess((v) => (v == null ? '' : v), z.string().trim());
 
 const feedbackSchema = z.object({
-  overall_score: clampInt(0, 100),
+  // Nota geral sem número (ex.: "thirty"): ignoramos aqui e calculamos pela média das respostas em parseFeedback.
+  overall_score: z
+    .preprocess((v) => {
+      const n = toNumber(v);
+      return typeof n === 'number' && Number.isFinite(n) ? n : undefined;
+    }, clampInt(0, 100).optional())
+    .optional(),
   summary: text,
   encouragement: text,
-  strengths: z.array(text).min(1),
-  improvements: z.array(z.object({ point: text, why: text, how: text })),
+  strengths: z.array(text).default([]),
+  improvements: z.array(z.object({ point: text, why: softText, how: softText })).default([]),
   answer_reviews: z.array(
     z.object({
-      question_id: z.string(),
+      question_id: z.coerce.string(),
       score: clampInt(0, 10),
-      comment: text,
-      suggested_answer: text,
+      comment: softText,
+      suggested_answer: softText,
     }),
   ),
   filler_words_detected: z.array(z.string()).default([]),
   next_step: text,
 });
 
-export type Feedback = z.infer<typeof feedbackSchema>;
+export type Feedback = Omit<z.infer<typeof feedbackSchema>, 'overall_score'> & { overall_score: number };
 export type Report = Feedback & { questions: Question[] };
 
 /** Valida o feedback. Exige uma avaliação para cada pergunta e devolve na ordem das perguntas. */
 export function parseFeedback(raw: unknown, questions: Question[]): Feedback | null {
   const parsed = feedbackSchema.safeParse(raw);
   if (!parsed.success) return null;
-  const byId = new Map(parsed.data.answer_reviews.map((r) => [r.question_id, r]));
-  const reviews = questions.map((q) => byId.get(q.id));
+  const list = parsed.data.answer_reviews;
+  // "Q1", "q1" e "1" valem como o mesmo id.
+  const key = (id: string) => id.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^(\d+)$/, 'q$1');
+  const byId = new Map(list.map((r) => [key(r.question_id), r]));
+  let reviews = questions.map((q) => byId.get(key(q.id)));
+  // Ids fora do padrão, mas com uma avaliação por pergunta: vale a ordem em que vieram.
+  if (reviews.some((r) => !r) && list.length === questions.length) reviews = list;
   if (reviews.some((r) => !r)) return null;
-  return { ...parsed.data, answer_reviews: reviews as Feedback['answer_reviews'] };
+  const ordered = (reviews as typeof list).map((r, i) => ({ ...r, question_id: questions[i].id }));
+  const overall =
+    parsed.data.overall_score ?? Math.round((ordered.reduce((sum, r) => sum + r.score, 0) / ordered.length) * 10);
+  return { ...parsed.data, overall_score: overall, answer_reviews: ordered };
 }
 
 // ---------- Respostas ----------

@@ -12,9 +12,23 @@ export interface LLMClient {
 }
 
 /** Falha da IA (rede, limite do provedor, JSON quebrado). Quem chama decide se tenta de novo. */
-export class LLMError extends Error {}
+export class LLMError extends Error {
+  constructor(
+    message: string,
+    /** Quando o provedor recusou por excesso de uso (429) ou ficou fora do ar (5xx): vale esperar e tentar de novo. */
+    public retryable = false,
+    /** Espera pedida pelo provedor (cabeçalho retry-after), em milissegundos. */
+    public retryAfterMs?: number,
+  ) {
+    super(message);
+  }
+}
 
 const TIMEOUT_MS = 45_000;
+const MAX_ATTEMPTS = 3;
+const MAX_WAIT_MS = 10_000;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Modelos com plano gratuito (conferidos na documentação oficial em 2026-09).
 // Se o provedor trocar o nome, basta definir LLM_MODEL nos Secrets, sem mudar código.
@@ -37,7 +51,28 @@ export function createLLMClient(): LLMClient {
   }
   const key = Deno.env.get('GROQ_API_KEY');
   if (!key) throw new AppError('INTERNAL', 'Servidor sem configuração.');
-  return new GroqClient(key, model);
+  const groq = new GroqClient(key, model);
+  // Reserva opcional: se a chave do Gemini existir, ele atende quando o Groq recusar por excesso de uso.
+  const geminiKey = Deno.env.get('GEMINI_API_KEY');
+  return geminiKey ? new FallbackClient(groq, new GeminiClient(geminiKey, DEFAULT_MODEL.gemini)) : groq;
+}
+
+/** Usa o provedor principal; se ele estiver sobrecarregado (429/5xx), tenta o reserva na hora. */
+class FallbackClient implements LLMClient {
+  constructor(
+    private primary: LLMClient,
+    private backup: LLMClient,
+  ) {}
+
+  async generateJSON(req: LLMRequest) {
+    try {
+      return await this.primary.generateJSON(req);
+    } catch (err) {
+      if (!(err instanceof LLMError) || !err.retryable) throw err;
+      console.log(JSON.stringify({ llm: 'fallback', from: 'primary' }));
+      return this.backup.generateJSON(req);
+    }
+  }
 }
 
 async function post(url: string, headers: Record<string, string>, body: unknown, provider: string) {
@@ -57,7 +92,12 @@ async function post(url: string, headers: Record<string, string>, body: unknown,
   if (!res.ok) {
     console.log(JSON.stringify({ llm: provider, error: 'http', status: res.status }));
     await res.body?.cancel();
-    throw new LLMError(`http ${res.status}`);
+    const seconds = Number(res.headers.get('retry-after'));
+    throw new LLMError(
+      `http ${res.status} ${provider} retry-after=${res.headers.get('retry-after') ?? 'n/a'}`,
+      res.status === 429 || res.status >= 500,
+      Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : undefined,
+    );
   }
   return res.json();
 }
@@ -129,14 +169,45 @@ export async function generateValidated<T>(
   validate: (raw: unknown) => T | null,
   failMessage: string,
 ): Promise<T> {
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  let reason = 'desconhecido';
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      const result = validate(await llm.generateJSON(req));
+      const raw = await llm.generateJSON(req);
+      const result = validate(raw);
       if (result) return result;
-      console.log(JSON.stringify({ llm: 'validate', error: 'invalid_shape', attempt }));
+      reason = `formato_invalido {${describeShape(raw)}}`;
+      console.log(JSON.stringify({ llm: 'validate', error: 'invalid_shape', attempt, shape: describeShape(raw) }));
     } catch (err) {
       if (!(err instanceof LLMError)) throw err;
+      reason = err.message;
+      // Provedor sobrecarregado (várias pessoas ao mesmo tempo): espera um pouco, com variação
+      // aleatória para os pedidos não voltarem todos no mesmo instante.
+      if (err.retryable && attempt < MAX_ATTEMPTS) {
+        const wait = Math.min(err.retryAfterMs ?? 1500 * 2 ** (attempt - 1), MAX_WAIT_MS) + Math.random() * 500;
+        console.log(JSON.stringify({ llm: 'retry', attempt, wait_ms: Math.round(wait) }));
+        await sleep(wait);
+      }
     }
   }
-  throw new AppError('LLM_FAILED', failMessage);
+  // O motivo não tem texto do usuário nem da IA: só o tipo da falha (ajuda a achar o problema).
+  throw new AppError('LLM_FAILED', failMessage, { reason });
+}
+
+/** Resume o formato do JSON recebido (chaves, tamanhos de lista), sem copiar nenhum texto. Só para diagnóstico. */
+function describeShape(raw: unknown, depth = 0): string {
+  if (Array.isArray(raw)) {
+    // Para listas de objetos, mostra as chaves do primeiro item (é onde costuma estar a diferença).
+    const first = raw[0];
+    return `[${raw.length}${first && typeof first === 'object' && depth < 2 ? ` de {${describeShape(first, depth + 1)}}` : ''}]`;
+  }
+  if (!raw || typeof raw !== 'object') return typeof raw;
+  return Object.entries(raw as Record<string, unknown>)
+    .slice(0, 15)
+    .map(([k, v]) => {
+      if (Array.isArray(v)) return `${k}:${describeShape(v, depth)}`;
+      if (v === '' || v === null) return `${k}:vazio`;
+      // Textos curtos (como notas "45/100") aparecem inteiros; os longos viram só "string".
+      return `${k}:${typeof v === 'string' && v.length <= 12 ? JSON.stringify(v) : typeof v}`;
+    })
+    .join(',');
 }

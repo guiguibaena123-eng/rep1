@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { Bookmark, Lightbulb } from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -29,7 +29,12 @@ const s = t.showcase;
  * Vitrine de todos os componentes e estados (design/telas/Componentes.dc.html).
  * Só para desenvolvimento: sai do app antes do lançamento.
  */
-export default function ComponentsShowcase() {
+export default function DevShowcaseGate() {
+  if (!__DEV__) return <Redirect href="/" />;
+  return <ComponentsShowcase />;
+}
+
+function ComponentsShowcase() {
   const { colors } = useTheme();
   const toast = useToast();
   const [email, setEmail] = useState('ana.souza@gmail');
