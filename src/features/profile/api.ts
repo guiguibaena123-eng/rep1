@@ -81,7 +81,7 @@ export function useSaveDetails() {
 /** Outra pessoa já usa esse @ (o banco recusou por ser repetido). */
 export class UsernameTakenError extends Error {}
 
-function isUsernameTaken(error: { code?: string; message?: string }) {
+export function isUsernameTaken(error: { code?: string; message?: string }) {
   return error.code === '23505' && (error.message ?? '').includes('username');
 }
 

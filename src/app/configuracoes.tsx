@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import {
+  Ban,
   Bell,
   ChartNoAxesColumn,
   CircleHelp,
@@ -88,6 +89,7 @@ export default function SettingsScreen() {
         <GroupTitle>{p.privacy}</GroupTitle>
         <Group>
           <ShowAverageRow />
+          <Row icon={Ban} title={t.blocked.title} onPress={() => router.push('/bloqueados')} divider />
           <Row icon={Shield} title={p.privacyPolicy} onPress={() => router.push('/legal/privacidade')} divider />
           <Row icon={FileText} title={p.terms} onPress={() => router.push('/legal/termos')} divider />
           <Row icon={Download} title={exporting ? p.exporting : p.exportData} onPress={doExport} busy={exporting} divider />

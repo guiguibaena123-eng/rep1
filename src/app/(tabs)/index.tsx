@@ -5,6 +5,7 @@ import { RefreshControl, Pressable, StyleSheet, View } from 'react-native';
 
 import { BottomSheet, Button, Card, ProgressBar, Screen, Skeleton, SkeletonCard, Text, useToast } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { pickGreeting } from '@/features/home/greeting';
 import {
   useAbandonSession,
   useCompletedSessions,
@@ -17,7 +18,7 @@ import { useDrafts } from '@/features/interview/draft';
 import { DEFAULT_QUESTION_COUNT, MINUTES_PER_QUESTION, levelFromGoal } from '@/features/interview/types';
 import { useLinkedInReports } from '@/features/linkedin/api';
 import { NotificationBell } from '@/features/notifications/components';
-import { useTodayReminders } from '@/features/notifications/reminders';
+import { useReminderBadge, useTodayReminders } from '@/features/notifications/reminders';
 import { openPremium } from '@/features/plan/navigation';
 import { usePreferences } from '@/features/preferences/store';
 import { useProfile } from '@/features/profile/api';
@@ -69,7 +70,10 @@ export default function HomeTab() {
   const lastStep = useLastNextStep();
   const linkedin = useLinkedInReports();
   const nextStep = lastStep.data ?? null;
+  // Sorteada uma vez por abertura da tela: o texto não troca sozinho a cada atualização.
+  const [greetingKey] = useState(() => pickGreeting(new Date().getHours(), Math.random()));
   const reminders = useTodayReminders();
+  const { unseen: unseenReminders } = useReminderBadge(reminders);
 
   const p = profile.data;
   const linkedinNew = linkedin.data?.length === 0;
@@ -135,14 +139,14 @@ export default function HomeTab() {
   };
 
   return (
-    <Screen brand brandRight={<NotificationBell extra={reminders.length} />} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />}>
+    <Screen brand brandRight={<NotificationBell extra={unseenReminders} />} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} />}>
       <View style={styles.hello}>
         {/* Sem o perfil ainda: bloco pulsando em vez de "Oi! 👋" sem nome que depois troca. */}
         {profile.isPending ? (
           <Skeleton width="62%" height={38} radius={radius.button} />
         ) : (
           <Text variant="brandDisplay" accessibilityRole="header">
-            {h.greeting(p?.name)}
+            {h.greetings[greetingKey](p?.name)}
           </Text>
         )}
         <Text color="textSecondary">{h.subtitle}</Text>
@@ -411,6 +415,18 @@ function WeekCard({
           </Text>
         )}
       </View>
+
+      <Pressable
+        onPress={() => router.push('/calendario')}
+        accessibilityRole="link"
+        accessibilityLabel={t.calendar.link}
+        style={({ pressed }) => [styles.calendarLink, { borderTopColor: colors.border }, pressed && { opacity: 0.7 }]}
+      >
+        <Text weight="semibold" color="primaryInk">
+          {t.calendar.link}
+        </Text>
+        <ChevronRight size={20} color={colors.primaryInk} strokeWidth={iconStroke} />
+      </Pressable>
     </Card>
   );
 }
@@ -447,6 +463,7 @@ const styles = StyleSheet.create({
   gap12: { gap: space[3] },
   gap16: { gap: space[4] },
   eyebrow: { letterSpacing: 0.4 },
+  calendarLink: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, paddingTop: 12, borderTopWidth: 1 },
   streakHead: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   streakIcon: { width: 40, height: 40, borderRadius: radius.chip, alignItems: 'center', justifyContent: 'center' },
   week: { flexDirection: 'row', gap: space[1] },

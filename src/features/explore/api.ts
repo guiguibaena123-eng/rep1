@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { applyFollow, nextOffset, removeFromPages, type ExploreParams, type FollowState } from './logic';
 import {
   EXPLORE_PAGE_SIZE,
+  type BlockedPerson,
   type ExplorePerson,
   type FollowCounts,
   type FollowKind,
@@ -18,7 +19,7 @@ import {
 export const exploreKeys = {
   all: ['explore'] as const,
   list: (userId: string | undefined, params: ExploreParams) => ['explore', 'list', userId, params] as const,
-  similar: (userId: string | undefined) => ['explore', 'similar', userId] as const,
+  blocked: (userId: string | undefined) => ['explore', 'blocked', userId] as const,
   profile: (userId: string | undefined, id: string) => ['explore', 'profile', userId, id] as const,
   counts: (userId: string | undefined, id: string) => ['explore', 'counts', userId, id] as const,
   follows: (userId: string | undefined, id: string, kind: FollowKind) =>
@@ -32,12 +33,12 @@ export function errorCode(err: unknown) {
   return (err as { code?: string } | null)?.code ?? null;
 }
 
-/** "Pessoas para conhecer": 20 por página, carrega mais ao chegar no fim da lista. */
-export function useExplorePeople(params: ExploreParams) {
+/** Resultados da busca: 20 por página, carrega mais ao chegar no fim da lista. Só roda com `enabled` (a pessoa digitou). */
+export function useExplorePeople(params: ExploreParams, enabled = true) {
   const userId = useAuth().session?.user.id;
   return useInfiniteQuery({
     queryKey: exploreKeys.list(userId, params),
-    enabled: !!userId,
+    enabled: !!userId && enabled,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       const { data, error } = await supabase.rpc('explore_profiles', {
@@ -49,22 +50,6 @@ export function useExplorePeople(params: ExploreParams) {
       return (data ?? []) as ExplorePerson[];
     },
     getNextPageParam: (last, all) => nextOffset(last, all, EXPLORE_PAGE_SIZE),
-  });
-}
-
-/** "Com objetivos parecidos": mesma área e mesmo objetivo (até 10). */
-export function useSimilarPeople() {
-  const userId = useAuth().session?.user.id;
-  return useQuery({
-    queryKey: exploreKeys.similar(userId),
-    enabled: !!userId,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('similar_profiles', {
-        p_limit: 10,
-      });
-      if (error) throw error;
-      return (data ?? []) as ExplorePerson[];
-    },
   });
 }
 
@@ -233,6 +218,48 @@ export function useBlock() {
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: exploreKeys.all }),
+  });
+}
+
+/** Contas que a pessoa bloqueou (Configurações). 20 por página. */
+export function useBlockedList() {
+  const userId = useAuth().session?.user.id;
+  return useInfiniteQuery({
+    queryKey: exploreKeys.blocked(userId),
+    enabled: !!userId,
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      const { data, error } = await supabase.rpc('blocked_list', {
+        p_limit: EXPLORE_PAGE_SIZE,
+        p_offset: pageParam,
+      });
+      if (error) throw error;
+      return (data ?? []) as BlockedPerson[];
+    },
+    getNextPageParam: (last, all) => nextOffset(last, all, EXPLORE_PAGE_SIZE),
+  });
+}
+
+/** Desbloquear: a pessoa sai da lista na hora e volta a aparecer no Explorar (sem seguir de novo). */
+export function useUnblock() {
+  const queryClient = useQueryClient();
+  const userId = useAuth().session?.user.id;
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc('unblock_user', { p_target: id });
+      if (error) throw error;
+    },
+    onMutate: async (id) => {
+      const key = exploreKeys.blocked(userId);
+      await queryClient.cancelQueries({ queryKey: key });
+      const before = queryClient.getQueryData(key);
+      queryClient.setQueryData(key, (data: unknown) => removeFromPages(data, id));
+      return { before };
+    },
+    onError: (_err, _id, ctx) => {
+      queryClient.setQueryData(exploreKeys.blocked(userId), ctx?.before);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: exploreKeys.all }),
   });
 }
 

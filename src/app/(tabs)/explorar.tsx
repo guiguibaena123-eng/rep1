@@ -1,14 +1,14 @@
 import { useNetInfo } from '@react-native-community/netinfo';
 import { router } from 'expo-router';
-import { Eye, Search, Users, WifiOff, X } from 'lucide-react-native';
+import { Eye, Search, WifiOff, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button, Card, Chip, EmptyState, SkeletonCard, Text, useToast } from '@/components';
 import { BrandLogo, brandLogoTop } from '@/components/Screen';
-import { useExplorePeople, useSimilarPeople } from '@/features/explore/api';
-import { PersonCard, PersonRow } from '@/features/explore/components';
+import { useExplorePeople } from '@/features/explore/api';
+import { PersonRow } from '@/features/explore/components';
 import { canFilterNear, exploreParams, filterChips, toggleFilter } from '@/features/explore/logic';
 import type { ExploreFilter, ExplorePerson } from '@/features/explore/types';
 import { useProfile } from '@/features/profile/api';
@@ -20,8 +20,8 @@ const x = t.explore;
 const SEARCH_DEBOUNCE_MS = 300;
 
 /**
- * T20 Explorar: busca (nome, título, área e competências; 300 ms), filtros em chips (múltipla escolha),
- * "Com objetivos parecidos" (carrossel) e "Pessoas para conhecer" (20 por página, carrega ao rolar).
+ * T20 Explorar: ninguém aparece até a pessoa digitar na busca (@, nome, título, área ou competências; 300 ms).
+ * Os filtros em chips (múltipla escolha) refinam o resultado. 20 por página, carrega ao rolar.
  * Só aparecem perfis públicos, nunca o próprio. Sem chat nesta versão.
  */
 export default function ExploreTab() {
@@ -42,11 +42,11 @@ export default function ExploreTab() {
   }, [typed]);
 
   const params = exploreParams(query, selected, profile);
-  const people = useExplorePeople(params);
-  const similar = useSimilarPeople();
+  // "@" sozinho ainda não é busca: o banco devolveria todo mundo.
+  const searching = (params.p_query ?? '').replace(/^@+/, '').trim().length > 0;
+  const people = useExplorePeople(params, searching);
   const chips = filterChips(profile);
-  const narrowing = !!params.p_query || selected.length > 0;
-  const list = people.data?.pages.flat() ?? [];
+  const list = searching ? (people.data?.pages.flat() ?? []) : [];
 
   const pick = (key: ExploreFilter) => {
     if (key === 'near' && !selected.includes('near') && !canFilterNear(profile)) {
@@ -61,18 +61,10 @@ export default function ExploreTab() {
     setQuery('');
   };
 
-  const refreshing = (people.isRefetching && !people.isFetchingNextPage) || similar.isRefetching;
+  const refreshing = people.isRefetching && !people.isFetchingNextPage;
   const refresh = () => {
-    people.refetch();
-    similar.refetch();
+    if (searching) people.refetch();
   };
-
-  const similarList = similar.data ?? [];
-  const showSimilar = !narrowing && similarList.length > 0;
-  const similarText =
-    profile?.goal && profile.area && profile.area !== 'outra'
-      ? x.similarText(t.options.goal[profile.goal], t.options.area[profile.area])
-      : null;
 
   const header = (
     <View style={{ gap: 20 }}>
@@ -103,6 +95,7 @@ export default function ExploreTab() {
         </View>
       </View>
 
+      {searching && (
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -115,6 +108,7 @@ export default function ExploreTab() {
           <Chip key={c.key} role="checkbox" label={c.label} selected={selected.includes(c.key)} onPress={() => pick(c.key)} />
         ))}
       </ScrollView>
+      )}
 
       {profile && !profile.is_public && (
         <View style={styles.padded}>
@@ -142,34 +136,18 @@ export default function ExploreTab() {
         </View>
       )}
 
-      {showSimilar && (
-        <View style={{ gap: space[3] }}>
-          <View style={styles.padded}>
-            <Text variant="sectionTitle" accessibilityRole="header">
-              {x.similarTitle}
-            </Text>
-            {!!similarText && (
-              <Text variant="bodySmall" color="textSecondary">
-                {similarText}
-              </Text>
-            )}
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.fixedRow} contentContainerStyle={styles.carousel}>
-            {similarList.map((p) => (
-              <PersonCard key={p.id} person={p} />
-            ))}
-          </ScrollView>
-        </View>
+      {searching && (
+        <Text variant="sectionTitle" accessibilityRole="header" style={styles.padded}>
+          {x.results}
+        </Text>
       )}
-
-      <Text variant="sectionTitle" accessibilityRole="header" style={styles.padded}>
-        {params.p_query ? x.results : x.peopleTitle}
-      </Text>
     </View>
   );
 
   let empty;
-  if (people.isPending) {
+  if (!searching) {
+    empty = <EmptyState icon={Search} title={x.startTitle} text={x.startText} />;
+  } else if (people.isPending) {
     empty = (
       <View style={styles.listGap}>
         <SkeletonCard lines={3} />
@@ -194,7 +172,7 @@ export default function ExploreTab() {
       </Card>
     );
   } else {
-    empty = narrowing ? (
+    empty = (
       <EmptyState
         icon={Search}
         title={x.emptyTitle}
@@ -206,8 +184,6 @@ export default function ExploreTab() {
           setSelected([]);
         }}
       />
-    ) : (
-      <EmptyState icon={Users} title={x.emptyTitle} text={x.emptyNobody} />
     );
   }
 
@@ -265,6 +241,5 @@ const styles = StyleSheet.create({
   chips: { gap: space[2], paddingHorizontal: screenPadding, paddingVertical: space[1], alignItems: 'center' },
   notice: { flexDirection: 'row', gap: space[3], padding: space[4], borderRadius: radius.card },
   noticeLink: { alignSelf: 'flex-start', minHeight: 36, justifyContent: 'center' },
-  carousel: { gap: space[3], paddingHorizontal: screenPadding, alignItems: 'stretch' },
   listGap: { gap: 10 },
 });

@@ -168,6 +168,8 @@ function RootNavigator() {
           <Stack.Screen name="notificacoes" />
           <Stack.Screen name="meu-perfil" />
           <Stack.Screen name="configuracoes" />
+          <Stack.Screen name="bloqueados" />
+          <Stack.Screen name="calendario" />
           <Stack.Screen name="idioma" />
           {/* Tela comum (não modal): no iOS os avisos (toast) ficam atrás de telas modais. */}
           <Stack.Screen name="premium" />

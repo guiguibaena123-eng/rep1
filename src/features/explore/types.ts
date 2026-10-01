@@ -31,6 +31,9 @@ export type ExplorePerson = {
   verified: VerifiedKind | null;
 };
 
+/** Uma conta bloqueada pela pessoa logada (função blocked_list). */
+export type BlockedPerson = Pick<ExplorePerson, 'id' | 'name' | 'username' | 'photo_path'>;
+
 /** Perfil de outra pessoa (função public_profile). Nunca tem e-mail, idade, plano ou notas. */
 export type PublicProfile = {
   id: string;

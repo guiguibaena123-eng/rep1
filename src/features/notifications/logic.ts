@@ -1,7 +1,9 @@
 import type { Streak } from '@/features/progress/logic';
 import { t } from '@/i18n';
 
-import type { LocalReminder } from './types';
+import type { InfiniteData } from '@tanstack/react-query';
+
+import type { AppNotification, LocalReminder } from './types';
 
 /**
  * Lembretes de hoje para a aba Notificações.
@@ -40,4 +42,25 @@ export function timeAgo(iso: string, now: Date) {
   const days = Math.floor(hours / 24);
   if (days < 7) return a.days(days);
   return new Date(iso).toLocaleDateString();
+}
+
+/** Lista em cache com tudo "lido" (sem lista, devolve undefined; nada novo para marcar, devolve a mesma). */
+export function settleRead(data: InfiniteData<AppNotification[]> | undefined) {
+  if (!data || data.pages.every((page) => page.every((n) => n.is_read))) return data;
+  return { ...data, pages: data.pages.map((page) => page.map((n) => (n.is_read ? n : { ...n, is_read: true }))) };
+}
+
+/** Identifica um lembrete de hoje para saber se já foi visto: "userId:dia:tipo". */
+export function reminderKey(userId: string | undefined, day: string, reminder: LocalReminder) {
+  return `${userId ?? ''}:${day}:${reminder.kind}`;
+}
+
+/** Lembretes de hoje que a pessoa ainda não viu na tela Notificações (contam no sino). */
+export function unseenReminders(
+  reminders: readonly LocalReminder[],
+  seen: readonly string[],
+  userId: string | undefined,
+  day: string,
+) {
+  return reminders.filter((r) => !seen.includes(reminderKey(userId, day, r)));
 }

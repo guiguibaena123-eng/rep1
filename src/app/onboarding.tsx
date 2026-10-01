@@ -1,17 +1,19 @@
 import { ChevronLeft } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Button, Chip, Input, Screen, Text, useToast } from '@/components';
-import { useUpdateProfile } from '@/features/profile/api';
+import { checkUsername, isUsernameTaken, useUpdateProfile } from '@/features/profile/api';
+import { normalizeUsername, USERNAME_MAX, usernameMessage, usernameProblem } from '@/features/profile/details';
 import { AREAS, DEFAULT_AGE, GOALS, MAX_AGE, MIN_AGE, type Area, type Goal } from '@/features/profile/types';
 import { t } from '@/i18n';
 import { useTheme } from '@/theme/ThemeProvider';
 import { fonts, iconStroke, radius, size } from '@/theme/tokens';
 
 const o = t.onboarding;
+const USERNAME_CHECK_MS = 400;
 /** O seletor deixa descer um pouco abaixo do mínimo só para explicar a regra de idade. */
 const STEPPER_MIN = MIN_AGE - 3;
 const MOUTHS = ['M11 23c2-3 8-3 10 0', 'M11 22.5c2-1.5 8-1.5 10 0', 'M11 21.5h10', 'M11 20.5c2 1.5 8 1.5 10 0', 'M10.5 20c2 3.5 9 3.5 11 0'];
@@ -26,6 +28,9 @@ export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
+  const [username, setUsername] = useState('');
+  const [usernameTaken, setUsernameTaken] = useState(false);
+  const [checked, setChecked] = useState<{ username: string; free: boolean | null } | null>(null);
   const [age, setAge] = useState(DEFAULT_AGE);
   const [goal, setGoal] = useState<Goal | null>(null);
   const [area, setArea] = useState<Area | null>(null);
@@ -34,7 +39,30 @@ export default function OnboardingScreen() {
   const trimmed = name.trim();
   const nameOk = trimmed.length >= 2 && trimmed.length <= 40;
   const ageOk = age >= MIN_AGE && age <= MAX_AGE;
-  const valid = [nameOk && ageOk, goal !== null, area !== null && feel !== null][step];
+  // O @ é opcional: vazio, o banco cria um a partir do nome. Preenchido, precisa ter o formato certo e estar livre.
+  const handle = normalizeUsername(username);
+  const handleProblem = handle ? usernameProblem(handle) : null;
+  const shouldCheck = !!handle && !handleProblem;
+  const handleChecking = shouldCheck && checked?.username !== handle;
+  const handleTaken = usernameTaken || (shouldCheck && checked?.username === handle && checked.free === false);
+  const handleFree = shouldCheck && checked?.username === handle && checked.free === true;
+  const handleOk = !handle || (!handleProblem && !handleChecking && !handleTaken);
+  const handleError = handleProblem ? usernameMessage(handleProblem) : handleTaken ? t.editProfile.usernameTaken : null;
+
+  useEffect(() => {
+    if (!shouldCheck) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const free = await checkUsername(handle);
+      if (!cancelled) setChecked({ username: handle, free });
+    }, USERNAME_CHECK_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [handle, shouldCheck]);
+
+  const valid = [nameOk && ageOk && handleOk, goal !== null, area !== null && feel !== null][step];
   const isLast = step === 2;
 
   const next = () => {
@@ -43,6 +71,7 @@ export default function OnboardingScreen() {
     update.mutate(
       {
         name: trimmed,
+        ...(handle ? { username: handle } : {}),
         age,
         goal,
         area,
@@ -51,7 +80,17 @@ export default function OnboardingScreen() {
         accepted_terms_at: new Date().toISOString(),
       },
       // Sucesso: o perfil completo libera as abas e o app troca de tela sozinho.
-      { onError: () => toast.show(o.saveError, 'error') },
+      {
+        onError: (err) => {
+          // Alguém pegou o @ entre a conferência e o envio: volta ao passo do nome para escolher outro.
+          if (isUsernameTaken(err as { code?: string; message?: string })) {
+            setUsernameTaken(true);
+            setStep(0);
+            return;
+          }
+          toast.show(o.saveError, 'error');
+        },
+      },
     );
   };
 
@@ -110,6 +149,33 @@ export default function OnboardingScreen() {
                 textContentType="givenName"
                 error={nameTouched && !nameOk ? o.nameInvalid : null}
               />
+              <View style={{ gap: 6 }}>
+              <Input
+                label={o.usernameLabel}
+                placeholder={o.usernamePlaceholder}
+                value={username}
+                onChangeText={(value) => {
+                  setUsername(value);
+                  setUsernameTaken(false);
+                }}
+                maxLength={USERNAME_MAX + 1}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="username-new"
+                textContentType="username"
+                accessibilityHint={o.usernameHint}
+                error={handleError}
+              />
+              {!handleError && (
+                <Text variant="caption" color={handleFree ? 'successInk' : 'textSecondary'} accessibilityLiveRegion="polite">
+                  {handleChecking
+                    ? t.editProfile.usernameChecking
+                    : handleFree
+                      ? t.editProfile.usernameFree(handle)
+                      : o.usernameHint}
+                </Text>
+              )}
+              </View>
             </View>
             <View style={styles.block}>
               <Text variant="sectionTitle" nativeID="idade">

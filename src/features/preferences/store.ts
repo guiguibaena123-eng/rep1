@@ -27,6 +27,9 @@ type PreferencesState = {
   celebratedStreaks: string[];
   /** Último plano visto por conta neste aparelho (true = Premium). Serve para avisar "Seu Premium está ativo". */
   premiumSeen: Record<string, boolean>;
+  /** Lembretes de hoje já vistos na tela Notificações: "userId:dia:tipo". Só guarda os mais recentes. */
+  seenReminders: string[];
+  markRemindersSeen: (keys: string[]) => void;
   setThemeMode: (mode: ThemeMode) => void;
   setPremiumSeen: (userId: string, premium: boolean) => void;
   markWelcomeSeen: () => void;
@@ -49,6 +52,9 @@ export const usePreferences = create<PreferencesState>()(
       celebratedFirst: [],
       celebratedStreaks: [],
       premiumSeen: {},
+      seenReminders: [],
+      markRemindersSeen: (keys) =>
+        set((s) => ({ seenReminders: [...new Set([...s.seenReminders, ...keys])].slice(-30) })),
       setThemeMode: (themeMode) => set({ themeMode }),
       setPremiumSeen: (userId, premium) => set((s) => ({ premiumSeen: { ...s.premiumSeen, [userId]: premium } })),
       markWelcomeSeen: () => set({ seenWelcome: true }),
@@ -59,13 +65,14 @@ export const usePreferences = create<PreferencesState>()(
     {
       name: 'pronto-preferences',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ themeMode, language, seenWelcome, celebratedFirst, celebratedStreaks, premiumSeen }) => ({
+      partialize: ({ themeMode, language, seenWelcome, celebratedFirst, celebratedStreaks, premiumSeen, seenReminders }) => ({
         themeMode,
         language,
         seenWelcome,
         celebratedFirst,
         celebratedStreaks,
         premiumSeen,
+        seenReminders,
       }),
       onRehydrateStorage: () => (state) => {
         // O idioma salvo vale antes da primeira tela (a raiz espera `hydrated`).

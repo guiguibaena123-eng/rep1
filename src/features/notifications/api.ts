@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { nextOffset } from '@/features/explore/logic';
 import { supabase } from '@/lib/supabase';
 
+import { settleRead } from './logic';
 import { NOTIFICATIONS_PAGE_SIZE, type AppNotification } from './types';
 
 /** Todas as chaves começam com 'notifications': invalidar essa raiz recarrega tudo. */
@@ -53,9 +54,7 @@ export function useSettleListOnLeave() {
   const queryClient = useQueryClient();
   const userId = useAuth().session?.user.id;
   return useCallback(() => {
-    queryClient.setQueryData<InfiniteData<AppNotification[]>>(notificationKeys.list(userId), (old) =>
-      old && { ...old, pages: old.pages.map((p) => p.map((i) => (i.is_read ? i : { ...i, is_read: true }))) },
-    );
+    queryClient.setQueryData<InfiniteData<AppNotification[]>>(notificationKeys.list(userId), settleRead);
   }, [queryClient, userId]);
 }
 

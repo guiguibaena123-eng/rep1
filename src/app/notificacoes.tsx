@@ -10,7 +10,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { usePendingSession } from '@/features/interview/api';
 import { useMarkAllRead, useNotifications, useSettleListOnLeave } from '@/features/notifications/api';
 import { timeAgo } from '@/features/notifications/logic';
-import { useTodayReminders } from '@/features/notifications/reminders';
+import { useReminderBadge, useTodayReminders } from '@/features/notifications/reminders';
 import type { AppNotification, LocalReminder } from '@/features/notifications/types';
 import { Avatar } from '@/features/profile/Avatar';
 import { VerifiedBadge } from '@/features/profile/VerifiedBadge';
@@ -48,6 +48,14 @@ export default function NotificationsScreen() {
   useEffect(() => {
     if (hasUnread) markRead();
   }, [hasUnread, markRead]);
+
+  // Os lembretes de hoje também contam como vistos ao abrir (some do número do sino).
+  const remindersKey = reminders.map((r) => r.kind).join();
+  const { markSeen } = useReminderBadge(reminders);
+  useEffect(() => {
+    if (remindersKey) markSeen();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remindersKey]);
 
   // Ao sair, o cache vira "lido": reabrir logo depois não mostra o destaque de novo.
   const settleOnLeave = useSettleListOnLeave();
