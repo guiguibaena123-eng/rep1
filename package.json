@@ -68,7 +68,8 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "check": "npm run lint && npm run typecheck && npm run test"
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "build:web": "expo export --platform web && node scripts/fix-web-dist.js"
   },
   "jest": {
     "preset": "jest-expo",
