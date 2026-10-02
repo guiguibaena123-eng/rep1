@@ -16,7 +16,7 @@ describe('idiomas', () => {
   it('troca na hora, inclusive nos atalhos guardados antes', () => {
     setLanguage('en');
     expect(t.tabs.home).toBe('Home');
-    expect(h.greeting('Ana')).toBe('Hi, Ana! 👋');
+    expect(h.greetings.hello('Ana')).toBe('Hello, Ana!');
     setLanguage('de');
     expect(h.weekNames[0]).toBe('Montag');
   });

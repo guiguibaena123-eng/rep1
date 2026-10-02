@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
-import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Card, Screen, ScreenHeader, SkeletonCard, Text } from '@/components';
+import { useCompletedSessions, useInterviewUsage } from '@/features/interview/api';
 import { useActivityDates, useSimulationTimes } from '@/features/progress/api';
 import {
   dayStatus,
@@ -16,12 +17,15 @@ import {
   timeByDay,
   type DayStatus,
 } from '@/features/progress/calendar';
-import { computeStreak } from '@/features/progress/logic';
+import { computeStreak, countThisWeek, weeklyGoal } from '@/features/progress/logic';
+import { WeeklyGoalCard } from '@/features/progress/WeeklyGoalCard';
 import { useProfile } from '@/features/profile/api';
+import { isPremium } from '@/features/profile/types';
+import { useTipProgress } from '@/features/tips/api';
 import { t } from '@/i18n';
 import { dateSP } from '@/lib/dates';
 import { useTheme } from '@/theme/ThemeProvider';
-import { iconStroke, radius, size, space } from '@/theme/tokens';
+import { iconStroke, size, space } from '@/theme/tokens';
 
 const c = t.calendar;
 const CELL = 40;
@@ -32,8 +36,8 @@ function goBack() {
 }
 
 /**
- * Meu treino (aberta pela Início): calendário do mês com os dias treinados (marcados) e os dias
- * sem treino (cubo de gelo), tempo de simulação do mês e sequência. Tocar num dia mostra o detalhe.
+ * Meu treino (aberta pela Início): calendário do mês com os dias treinados (✓ âmbar, igual à semana da Início);
+ * dias sem treino ficam neutros, sem destaque (calma, sem culpa). Tempo de simulação do mês e sequência. Tocar num dia mostra o detalhe.
  * "Treinou" segue a mesma regra da sequência: simulação, dica lida ou análise do LinkedIn.
  */
 export default function CalendarScreen() {
@@ -41,6 +45,9 @@ export default function CalendarScreen() {
   const profile = useProfile().data;
   const activity = useActivityDates();
   const sims = useSimulationTimes();
+  const usage = useInterviewUsage();
+  const completed = useCompletedSessions();
+  const tipProgress = useTipProgress();
 
   const now = new Date();
   const today = dateSP(now);
@@ -53,6 +60,16 @@ export default function CalendarScreen() {
   const startDay = startDayOf(profile?.created_at, days ?? []);
   const streak = days ? computeStreak(days, now) : null;
   const summary = monthSummary(month, today, startDay, active, times);
+  // Meta por plano: o grátis conta também as dicas lidas na semana.
+  const premium = usage.data?.premium ?? isPremium(profile);
+  const goal =
+    completed.data && (premium || tipProgress.data)
+      ? weeklyGoal(
+          premium,
+          countThisWeek(completed.data.map((s) => s.completed_at), now),
+          countThisWeek((tipProgress.data ?? []).map((r) => r.read_at), now),
+        )
+      : null;
 
   const ready = !!days && !!sims.data;
   const thisMonth = monthOf(today);
@@ -83,12 +100,21 @@ export default function CalendarScreen() {
           </>
         ) : (
           <>
-            <View style={styles.stats}>
-              <Stat label={c.trained} value={c.days(summary.done)} />
-              <Stat label={c.time} value={formatMinutes(summary.minutes)} />
-              <Stat label={c.streak} value={c.days(streak?.current ?? 0)} />
-              <Stat label={c.longest} value={c.days(streak?.longest ?? 0)} />
+            <View style={styles.summary}>
+              <Text variant="cardTitle" accessibilityRole="header">
+                {c.summary(summary.done, c.months[month.month])}
+              </Text>
+              <Text color="textSecondary">
+                {[
+                  summary.minutes > 0 ? c.summaryTime(formatMinutes(summary.minutes)) : null,
+                  streak && streak.longest > 0 ? c.summaryStreak(c.days(streak.current), c.days(streak.longest)) : null,
+                ]
+                  .filter(Boolean)
+                  .join('\n')}
+              </Text>
             </View>
+
+            {goal && <WeeklyGoalCard goal={goal} />}
 
             <Card style={{ gap: space[3] }}>
               <View style={styles.monthHead}>
@@ -98,11 +124,11 @@ export default function CalendarScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={c.prev}
                   accessibilityState={{ disabled: !canPrev }}
-                  style={[styles.nav, !canPrev && { opacity: 0.3 }]}
+                  style={styles.nav}
                 >
-                  <ChevronLeft size={22} color={colors.text} strokeWidth={iconStroke} />
+                  <ChevronLeft size={22} color={canPrev ? colors.text : colors.border} strokeWidth={iconStroke} />
                 </Pressable>
-                <Text variant="sectionTitle" accessibilityRole="header" accessibilityLiveRegion="polite">
+                <Text variant="sectionTitle" accessibilityLiveRegion="polite">
                   {`${c.months[month.month]} ${month.year}`}
                 </Text>
                 <Pressable
@@ -111,9 +137,9 @@ export default function CalendarScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={c.next}
                   accessibilityState={{ disabled: !canNext }}
-                  style={[styles.nav, !canNext && { opacity: 0.3 }]}
+                  style={styles.nav}
                 >
-                  <ChevronRight size={22} color={colors.text} strokeWidth={iconStroke} />
+                  <ChevronRight size={22} color={canNext ? colors.text : colors.border} strokeWidth={iconStroke} />
                 </Pressable>
               </View>
 
@@ -133,35 +159,35 @@ export default function CalendarScreen() {
                     const number = Number(day.slice(8));
                     const on = selected === day;
                     return (
-                      <View key={day} style={styles.cell}>
-                        <Pressable
-                          onPress={() => setSelected(on ? null : day)}
-                          accessibilityRole="button"
-                          accessibilityLabel={c.cellA11y(number, statusText[status])}
-                          accessibilityState={{ selected: on }}
+                      <Pressable
+                        key={day}
+                        onPress={() => setSelected(on ? null : day)}
+                        accessibilityRole="button"
+                        accessibilityLabel={c.cellA11y(number, statusText[status])}
+                        accessibilityState={{ selected: on }}
+                        style={styles.cell}
+                      >
+                        <View
                           style={[
                             styles.day,
-                            status === 'done' && { backgroundColor: colors.warningSoft },
-                            status === 'ice' && { backgroundColor: colors.primarySoft },
+                            status === 'done' && { backgroundColor: colors.warning },
                             status === 'today' && { borderWidth: 2, borderStyle: 'dashed', borderColor: colors.primary },
                             on && { borderWidth: 2, borderStyle: 'solid', borderColor: colors.text },
                           ]}
                         >
                           {status === 'done' ? (
-                            <Text style={styles.ice}>🔥</Text>
-                          ) : status === 'ice' ? (
-                            <Text style={styles.ice}>🧊</Text>
+                            <Check size={18} color={colors.onWarning} strokeWidth={2.5} />
                           ) : (
                             <Text
                               variant="bodySmall"
                               weight={status === 'today' ? 'semibold' : undefined}
-                              style={{ color: status === 'today' ? colors.text : colors.textDisabled }}
+                              style={{ color: status === 'today' || status === 'ice' ? colors.textSecondary : colors.textDisabled }}
                             >
                               {number}
                             </Text>
                           )}
-                        </Pressable>
-                      </View>
+                        </View>
+                      </Pressable>
                     );
                   })}
                 </View>
@@ -169,16 +195,11 @@ export default function CalendarScreen() {
 
               <View style={styles.legend}>
                 <View style={styles.legendItem}>
-                  <Text style={styles.legendIce}>🔥</Text>
+                  <View style={[styles.legendDot, { backgroundColor: colors.warning }]}>
+                    <Check size={10} color={colors.onWarning} strokeWidth={3} />
+                  </View>
                   <Text variant="caption" color="textSecondary">
                     {c.legendDone}
-                  </Text>
-                </View>
-                <View style={styles.legendItem}>
-                  <Text style={styles.legendIce}>🧊</Text>
-                  <Text variant="caption" color="textSecondary">
-                    {c.legendIce}
-                    {summary.ice > 0 ? ` · ${summary.ice}` : ''}
                   </Text>
                 </View>
               </View>
@@ -197,9 +218,6 @@ export default function CalendarScreen() {
                 {c.empty}
               </Text>
             ) : null}
-            <Text variant="caption" color="textSecondary">
-              {c.note}
-            </Text>
           </>
         )}
       </Screen>
@@ -207,24 +225,7 @@ export default function CalendarScreen() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  const { colors } = useTheme();
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${label}: ${value}`}
-      style={[styles.stat, { backgroundColor: colors.surface, borderColor: colors.border }]}
-    >
-      <Text variant="caption" color="textSecondary">
-        {label}
-      </Text>
-      <Text variant="sectionTitle">{value}</Text>
-    </View>
-  );
-}
-
 function DayDetail({ day, status, time }: { day: string; status: DayStatus; time?: { minutes: number; count: number } }) {
-  const { colors } = useTheme();
   const date = `${Number(day.slice(8))} ${c.months[Number(day.slice(5, 7)) - 1]} ${day.slice(0, 4)}`;
   let text: string;
   if (status === 'done') text = time ? `${c.dayDone} ${c.daySims(time.count, formatMinutes(time.minutes))}` : `${c.dayDone} ${c.dayOther}`;
@@ -233,9 +234,9 @@ function DayDetail({ day, status, time }: { day: string; status: DayStatus; time
   else text = c.dayBefore;
 
   return (
-    <Card style={{ gap: space[1], backgroundColor: status === 'ice' ? colors.primarySoft : colors.surface }}>
+    <Card style={{ gap: space[1] }}>
       <Text weight="semibold" accessibilityRole="header">
-        {status === 'ice' ? `🧊 ${date}` : date}
+        {date}
       </Text>
       <Text variant="bodySmall" color="textSecondary" accessibilityLiveRegion="polite">
         {text}
@@ -245,16 +246,14 @@ function DayDetail({ day, status, time }: { day: string; status: DayStatus; time
 }
 
 const styles = StyleSheet.create({
-  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: space[3] },
-  stat: { flexBasis: '47%', flexGrow: 1, gap: 2, padding: space[3], borderWidth: 1, borderRadius: radius.card },
+  summary: { gap: space[1] },
   monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   nav: { width: size.minTouch, height: size.minTouch, alignItems: 'center', justifyContent: 'center' },
   weekRow: { flexDirection: 'row' },
   weekLetter: { flex: 1, textAlign: 'center' },
-  cell: { flex: 1, alignItems: 'center', paddingVertical: 2 },
+  cell: { flex: 1, minHeight: size.minTouch, alignItems: 'center', justifyContent: 'center' },
   day: { width: CELL, height: CELL, borderRadius: CELL / 2, alignItems: 'center', justifyContent: 'center' },
-  ice: { fontSize: 20, lineHeight: 26 },
   legend: { flexDirection: 'row', gap: space[5], paddingTop: space[2], flexWrap: 'wrap' },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  legendIce: { fontSize: 14, lineHeight: 18 },
+  legendDot: { width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
 });

@@ -4,11 +4,12 @@ import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTimin
 
 import { t } from '@/i18n';
 import { useTheme } from '@/theme/ThemeProvider';
-import { motion, radius, size, space } from '@/theme/tokens';
+import { brandSurface, motion, radius, size, space } from '@/theme/tokens';
 
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'text';
+/** onBrand / onBrandText: sobre o degradê da marca (brandSurface). */
+export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'onBrand' | 'onBrandText';
 
 export type ButtonProps = {
   label: string;
@@ -40,7 +41,7 @@ export function Button({
   disabled = false,
   loading = false,
   icon,
-  fullWidth = variant !== 'text',
+  fullWidth = variant !== 'text' && variant !== 'onBrandText',
   compact = false,
   accessibilityLabel,
   accessibilityHint,
@@ -64,6 +65,10 @@ export function Button({
     if (variant === 'text') {
       return { bg: 'transparent', fg: disabled ? colors.textDisabled : colors.primary };
     }
+    if (variant === 'onBrandText') return { bg: 'transparent', fg: brandSurface.ink };
+    if (variant === 'onBrand') {
+      return { bg: pressed ? brandSurface.buttonPressed : brandSurface.buttonBg, fg: brandSurface.buttonInk };
+    }
     if (disabled) return { bg: colors.border, fg: colors.textDisabled };
     if (variant === 'secondary') return { bg: colors.primarySoft, fg: colors.primaryInk };
     return { bg: pressed ? colors.primaryPressed : colors.primary, fg: colors.onPrimary };
@@ -84,7 +89,7 @@ export function Button({
         style={({ pressed }) => {
           const p = palette(pressed);
           return [
-            variant === 'text' ? styles.textButton : styles.button,
+            variant === 'text' || variant === 'onBrandText' ? styles.textButton : styles.button,
             compact && styles.compact,
             { backgroundColor: p.bg },
           ];

@@ -156,6 +156,23 @@ export const shadowElevated = {
   elevation: 3,
 } as const;
 
-export const motion = { fast: 150, base: 200, slow: 250, pressScale: 0.97 } as const;
+/**
+ * Assinatura "fôlego": o degradê da marca num só lugar por tela (o cartão de ação da Início).
+ * Igual no claro e no escuro. Vai do azul mais escuro (canto do texto) ao mais claro (canto oposto):
+ * branco sobre #0447C8 = 7,4:1 e sobre #0A5CF0 = 5,5:1 (AA). O texto fica na metade escura.
+ */
+export const brandSurface = {
+  gradient: ['#0447C8', '#0A5CF0', '#4A9DFF'] as const,
+  ink: '#FFFFFF',
+  /** Texto de apoio sobre o degradê: 4,6:1 sobre #0A5CF0. */
+  inkSoft: '#DCE8FF',
+  /** Círculo do ícone sobre o degradê. */
+  iconBg: 'rgba(255,255,255,0.16)',
+  buttonBg: '#FFFFFF',
+  buttonPressed: '#E8F0FE',
+  buttonInk: '#0947D0',
+} as const;
+
+export const motion = { fast: 150, base: 200, slow: 250, breath: 900, stagger: 40, pressScale: 0.97 } as const;
 
 export const iconStroke = 1.75;

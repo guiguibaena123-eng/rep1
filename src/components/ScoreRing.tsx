@@ -12,7 +12,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { t } from '@/i18n';
 import { clampScore, scoreBand, scoreColors } from '@/lib/score';
 import { useTheme } from '@/theme/ThemeProvider';
-import { fonts } from '@/theme/tokens';
+import { fonts, motion } from '@/theme/tokens';
 
 import { Text } from './Text';
 
@@ -48,8 +48,8 @@ export function ScoreRing({ score, size = 'sm', showLabel = size === 'sm' }: Sco
 
   const offset = useSharedValue(reduceMotion ? target : CIRCUMFERENCE);
   useEffect(() => {
-    offset.set(reduceMotion ? target : withTiming(target, { duration: 700, easing: Easing.out(Easing.cubic) }));
-  }, [target, reduceMotion, offset]);
+    offset.set(reduceMotion ? target : withTiming(target, { duration: size === 'lg' ? motion.breath : 700, easing: Easing.out(Easing.cubic) }));
+  }, [target, reduceMotion, offset, size]);
 
   const animatedProps = useAnimatedProps(() => ({ strokeDashoffset: offset.get() }));
 

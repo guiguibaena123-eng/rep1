@@ -1,8 +1,8 @@
 /** Saudações da Início: as do horário do dia e algumas "livres", para a tela não receber sempre do mesmo jeito. */
-export const GREETING_KEYS = ['morning', 'afternoon', 'evening', 'night', 'hello', 'niceToSee', 'ready', 'hey'] as const;
+export const GREETING_KEYS = ['morning', 'afternoon', 'evening', 'night', 'hello', 'niceToSee', 'breathe', 'hey'] as const;
 export type GreetingKey = (typeof GREETING_KEYS)[number];
 
-const FREE: GreetingKey[] = ['hello', 'niceToSee', 'ready', 'hey'];
+const FREE: GreetingKey[] = ['hello', 'niceToSee', 'breathe', 'hey'];
 
 /** Saudação do horário: 5h–11h manhã, 12h–17h tarde, 18h–22h noite, de madrugada "noite" também (23h–4h). */
 export function timeGreeting(hour: number): GreetingKey {

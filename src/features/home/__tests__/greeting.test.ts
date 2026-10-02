@@ -23,6 +23,6 @@ describe('pickGreeting', () => {
 
   it('na segunda metade usa uma saudação livre, nunca fora da lista', () => {
     const keys = [0.5, 0.65, 0.8, 0.99, 1].map((roll) => pickGreeting(9, roll));
-    expect(keys).toEqual(['hello', 'niceToSee', 'ready', 'hey', 'hey']);
+    expect(keys).toEqual(['hello', 'niceToSee', 'breathe', 'hey', 'hey']);
   });
 });

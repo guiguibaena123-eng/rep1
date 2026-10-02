@@ -1,9 +1,10 @@
 import { router, useIsFocused } from 'expo-router';
-import { Check, ChevronRight, FileUser, Flame, TrendingUp } from 'lucide-react-native';
+import { BookOpen, Check, ChevronRight, FileUser, Flame, MessageCircle, TrendingUp, type LucideIcon } from 'lucide-react-native';
 import { useState } from 'react';
 import { RefreshControl, Pressable, StyleSheet, View } from 'react-native';
+import Animated, { ReduceMotion, ZoomIn } from 'react-native-reanimated';
 
-import { BottomSheet, Button, Card, ProgressBar, Screen, Skeleton, SkeletonCard, Text, useToast } from '@/components';
+import { BottomSheet, Button, Card, Screen, Skeleton, SkeletonCard, Text, useToast } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { pickGreeting } from '@/features/home/greeting';
 import {
@@ -28,25 +29,22 @@ import { useActivityDates } from '@/features/progress/api';
 import {
   STREAK_MILESTONES,
   computeStreak,
-  countThisWeek,
   reachedMilestone,
   resetsTomorrow,
   scoreTrend,
-  weeklyGoal,
   type Streak,
   type StreakMilestone,
   type Trend,
-  type WeeklyGoal,
 } from '@/features/progress/logic';
 import { ScoreChart } from '@/features/progress/ScoreChart';
-import { useTipProgress, useTipsCatalog } from '@/features/tips/api';
+import { useTipsCatalog } from '@/features/tips/api';
 import { HomeTipsSection } from '@/features/tips/HomeTipsSection';
 import { tipOfTheDay } from '@/features/tips/logic';
 import type { Tip } from '@/features/tips/types';
 import { t } from '@/i18n';
 import { dateSP, weekDatesSP } from '@/lib/dates';
 import { useTheme } from '@/theme/ThemeProvider';
-import { iconStroke, radius, space } from '@/theme/tokens';
+import { brandSurface, iconStroke, motion, radius, space } from '@/theme/tokens';
 
 const h = t.home;
 const TODAY_MINUTES = DEFAULT_QUESTION_COUNT * MINUTES_PER_QUESTION;
@@ -66,7 +64,6 @@ export default function HomeTab() {
   const completed = useCompletedSessions();
   const tips = useTipsCatalog();
   const usage = useInterviewUsage();
-  const tipProgress = useTipProgress();
   const lastStep = useLastNextStep();
   const linkedin = useLinkedInReports();
   const nextStep = lastStep.data ?? null;
@@ -92,15 +89,6 @@ export default function HomeTab() {
   const sessions = completed.data;
   const trend = sessions ? scoreTrend(sessions.flatMap((s) => (s.overall_score == null ? [] : [s.overall_score]))) : null;
   const isNew = sessions?.length === 0;
-  // Meta por plano: o grátis conta também as dicas lidas na semana.
-  const goal =
-    now && sessions && (premium || tipProgress.data)
-      ? weeklyGoal(
-          premium,
-          countThisWeek(sessions.map((s) => s.completed_at), now),
-          countThisWeek((tipProgress.data ?? []).map((r) => r.read_at), now),
-        )
-      : null;
   const tip = tips.data && now ? tipOfTheDay(tips.data.tips, premium, now) : null;
 
   // Conquista de sequência (3 ou 7 dias): uma vez por sequência, só com a Início na tela.
@@ -118,14 +106,13 @@ export default function HomeTab() {
   const actionLoading = profile.isPending || pending.isPending || usage.isPending || completed.isPending;
   const actionFailed = (profile.isError && !p) || pending.isError || usage.isError;
   const loading = activity.isPending || completed.isPending;
-  const failed = activity.isError || completed.isError || (!premium && tipProgress.isError);
+  const failed = activity.isError || completed.isError;
   const refreshing =
     profile.isRefetching ||
     pending.isRefetching ||
     activity.isRefetching ||
     completed.isRefetching ||
-    usage.isRefetching ||
-    tipProgress.isRefetching;
+    usage.isRefetching;
   const refresh = () => {
     profile.refetch();
     pending.refetch();
@@ -133,7 +120,6 @@ export default function HomeTab() {
     completed.refetch();
     tips.refetch();
     usage.refetch();
-    tipProgress.refetch();
     lastStep.refetch();
     linkedin.refetch();
   };
@@ -168,19 +154,23 @@ export default function HomeTab() {
       ) : freeUsed && usage.data ? (
         <FreeUsedCard tomorrow={now ? resetsTomorrow(usage.data.resets_at, now) : false} tip={tip} />
       ) : (
-        <Card variant="highlight" style={styles.gap16}>
-          <View style={{ gap: space[1] }}>
-            <Text variant="caption" weight="semibold" color="primaryInk" style={styles.eyebrow}>
-              {h.todayEyebrow}
+        <Card variant="brand" style={styles.action}>
+          <BrandHead icon={MessageCircle} label={h.todayEyebrow} />
+          <View style={styles.actionText}>
+            <Text variant="display" accessibilityRole="header" style={styles.onBrand}>
+              {`${t.options.area[area]} · ${t.levels[level]}`}
             </Text>
-            <Text variant="cardTitle" accessibilityRole="header">{`${t.options.area[area]} · ${t.levels[level]}`}</Text>
             {/* O "próximo passo" do último feedback deixa o treino de hoje com a cara da pessoa (T5). */}
-            {!isNew && !!nextStep && <Text variant="bodySmall">{h.todayNext(nextStep)}</Text>}
-            <Text variant="bodySmall" color="textOnSoft">
+            {!isNew && !!nextStep && (
+              <Text variant="bodySmall" weight="medium" style={styles.onBrand}>
+                {h.todayNext(nextStep)}
+              </Text>
+            )}
+            <Text variant="bodySmall" style={styles.onBrandSoft}>
               {isNew ? h.todayFirst(DEFAULT_QUESTION_COUNT, TODAY_MINUTES) : h.todayHint(DEFAULT_QUESTION_COUNT, TODAY_MINUTES)}
             </Text>
           </View>
-          <Button label={h.start} onPress={() => router.navigate('/treinar')} />
+          <Button label={h.start} variant="onBrand" onPress={() => router.navigate('/treinar')} />
         </Card>
       )}
 
@@ -191,19 +181,20 @@ export default function HomeTab() {
           <Text color="textSecondary">{h.progressError}</Text>
           <Button label={t.common.tryAgain} variant="secondary" compact onPress={refresh} loading={refreshing} />
         </Card>
-      ) : loading || !streak || !now || !goal ? (
+      ) : loading || !streak || !now ? (
         <SkeletonCard lines={4} />
       ) : (
-        <WeekCard streak={streak} activeDays={activity.data ?? []} now={now} tipOnly={freeUsed} goal={goal} />
+        <WeekCard streak={streak} activeDays={activity.data ?? []} now={now} tipOnly={freeUsed} />
       )}
 
       {/* O gráfico só aparece quando já dá para comparar (2 notas ou mais). */}
       {!failed && trend && trend.points.length >= 2 && <EvolutionCard trend={trend} />}
 
+      {linkedinNew && (
       <Pressable
         onPress={() => router.navigate('/linkedin')}
         accessibilityRole="button"
-        accessibilityLabel={linkedinNew ? `${h.linkedin}, ${h.newBadge}` : h.linkedin}
+        accessibilityLabel={`${h.linkedin}, ${h.newBadge}`}
         style={({ pressed }) => [
           styles.link,
           { backgroundColor: colors.surface, borderColor: colors.border },
@@ -214,20 +205,30 @@ export default function HomeTab() {
         <Text weight="semibold" style={{ flex: 1 }}>
           {h.linkedin}
         </Text>
-        {/* "Novo" só até a primeira análise do LinkedIn. */}
-        {linkedinNew ? (
-          <View style={[styles.badge, { backgroundColor: colors.primarySoft }]}>
-            <Text variant="caption" weight="semibold" color="primaryInk">
-              {h.newBadge}
-            </Text>
-          </View>
-        ) : (
-          <ChevronRight size={20} color={colors.textSecondary} strokeWidth={iconStroke} />
-        )}
+        <View style={[styles.badge, { backgroundColor: colors.primarySoft }]}>
+          <Text variant="caption" weight="semibold" color="primaryInk">
+            {h.newBadge}
+          </Text>
+        </View>
       </Pressable>
+      )}
 
       <AchievementModal kind={toCelebrate} onClose={closeAchievement} />
     </Screen>
+  );
+}
+
+/** Topo do cartão de ação: ícone do pilar num círculo claro + de que se trata (Treino de hoje, Continue…). */
+function BrandHead({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+  return (
+    <View style={styles.brandHead}>
+      <View style={styles.brandIcon}>
+        <Icon size={20} color={brandSurface.ink} strokeWidth={iconStroke} />
+      </View>
+      <Text variant="bodySmall" weight="semibold" style={styles.onBrandSoft}>
+        {label}
+      </Text>
+    </View>
   );
 }
 
@@ -237,24 +238,23 @@ export default function HomeTab() {
  */
 function FreeUsedCard({ tomorrow, tip }: { tomorrow: boolean; tip: Tip | null }) {
   return (
-    <Card variant="highlight" style={styles.gap16}>
-      <View style={{ gap: space[1] }}>
-        <Text variant="caption" weight="semibold" color="primaryInk" style={styles.eyebrow}>
-          {h.todayEyebrow}
-        </Text>
-        <Text variant="cardTitle" accessibilityRole="header">
+    <Card variant="brand" style={styles.action}>
+      <BrandHead icon={BookOpen} label={h.todayEyebrow} />
+      <View style={styles.actionText}>
+        <Text variant="display" accessibilityRole="header" style={styles.onBrand}>
           {h.usedTitle(tomorrow)}
         </Text>
-        <Text variant="bodySmall" color="textOnSoft">
+        <Text variant="bodySmall" style={styles.onBrandSoft}>
           {tip ? h.usedTextTip(tip.title, tip.read_minutes) : h.usedText}
         </Text>
       </View>
       <View style={{ gap: space[1] }}>
         <Button
           label={tip ? h.readTip : h.seeTips}
+          variant="onBrand"
           onPress={() => (tip ? router.push(`/dica/${tip.id}`) : router.navigate('/dicas'))}
         />
-        <Button label={h.usedPremium} variant="text" onPress={() => openPremium('inicio')} />
+        <Button label={h.usedPremium} variant="onBrandText" onPress={() => openPremium('inicio')} />
       </View>
     </Card>
   );
@@ -287,19 +287,19 @@ function PendingCard({ pending, premium }: { pending: PendingSession; premium: b
     });
 
   return (
-    <Card variant="highlight" style={styles.gap16}>
-      <View style={{ gap: space[1] }}>
-        <Text variant="caption" weight="semibold" color="primaryInk" style={styles.eyebrow}>
-          {h.pendingEyebrow}
+    <Card variant="brand" style={styles.action}>
+      <BrandHead icon={MessageCircle} label={h.pendingEyebrow} />
+      <View style={styles.actionText}>
+        <Text variant="display" accessibilityRole="header" style={styles.onBrand}>
+          {`${t.options.area[session.area]} · ${t.levels[session.level]}`}
         </Text>
-        <Text variant="cardTitle" accessibilityRole="header">{`${t.options.area[session.area]} · ${t.levels[session.level]}`}</Text>
-        <Text variant="bodySmall" color="textOnSoft">
+        <Text variant="bodySmall" style={styles.onBrandSoft}>
           {answersSaved ? h.pendingAnswers : h.pendingDraft}
         </Text>
       </View>
       <View style={{ gap: space[1] }}>
-        <Button label={answersSaved ? h.finishFeedback : h.continueSim} onPress={resume} />
-        <Button label={h.discard} variant="text" onPress={() => setConfirmOpen(true)} />
+        <Button label={answersSaved ? h.finishFeedback : h.continueSim} variant="onBrand" onPress={resume} />
+        <Button label={h.discard} variant="onBrandText" onPress={() => setConfirmOpen(true)} />
       </View>
 
       <BottomSheet
@@ -316,23 +316,20 @@ function PendingCard({ pending, premium }: { pending: PendingSession; premium: b
 }
 
 /**
- * Sua semana: sequência de dias, bolinhas de segunda a domingo (as com atividade ficam âmbar com ✓)
- * e a meta da semana conforme o plano (Premium: 3 simulações; grátis: 1 simulação + 2 dicas lidas).
- * Um cartão só, em vez de dois medidores separados.
+ * Sua semana: sequência de dias e bolinhas de segunda a domingo (as com atividade ficam âmbar com ✓).
+ * O cartão inteiro abre o Meu treino (calendário e meta da semana).
  */
 function WeekCard({
   streak,
   activeDays,
   now,
   tipOnly,
-  goal,
 }: {
   streak: Streak;
   activeDays: string[];
   now: Date;
   /** Simulação grátis da semana já usada: só sugere a dica. */
   tipOnly: boolean;
-  goal: WeeklyGoal;
 }) {
   const { colors } = useTheme();
   const today = dateSP(now);
@@ -353,13 +350,13 @@ function WeekCard({
   // Leitor de tela: a semana inteira numa frase só, em vez de 7 paradas.
   const weekA11y = `${h.weekA11y}: ${days.map((day, i) => h.dayA11y(h.weekNames[i], active.has(day), day === today)).join('; ')}`;
 
-  const complete = goal.done >= goal.total;
-  const count = goal.tips ? h.goalCount(goal.done, goal.total) : h.goalText(goal.done, goal.total);
-  const goalA11y = goal.tips ? h.goalFreeA11y(goal.sims.done, goal.tips.done) : `${h.goalTitle}: ${count}`;
-
   return (
-    <Card style={styles.gap16}>
-      <View style={styles.streakHead} accessible accessibilityRole="header" accessibilityLabel={`${h.streakA11y}. ${title}. ${subtitle}`}>
+    <Card
+      style={styles.gap16}
+      onPress={() => router.push('/calendario')}
+      accessibilityLabel={`${h.streakA11y}. ${title}. ${subtitle}. ${weekA11y}. ${t.calendar.link}`}
+    >
+      <View style={styles.streakHead}>
         <View style={[styles.streakIcon, { backgroundColor: colors.warningSoft }]}>
           <Flame size={22} color={colors.streakIcon} strokeWidth={iconStroke} />
         </View>
@@ -369,14 +366,16 @@ function WeekCard({
             {subtitle}
           </Text>
         </View>
+        <ChevronRight size={20} color={colors.textSecondary} strokeWidth={iconStroke} />
       </View>
-      <View style={styles.week} accessible accessibilityLabel={weekA11y}>
+      <View style={styles.week}>
         {days.map((day, i) => {
           const done = active.has(day);
           const isToday = day === today;
           return (
             <View key={day} style={styles.day}>
-              <View
+              <Animated.View
+                entering={ZoomIn.delay(i * motion.stagger).duration(motion.slow).reduceMotion(ReduceMotion.System)}
                 style={[
                   styles.dot,
                   done
@@ -389,7 +388,7 @@ function WeekCard({
                 ]}
               >
                 {done && <Check size={14} color={colors.onWarning} strokeWidth={2.5} />}
-              </View>
+              </Animated.View>
               <Text variant="caption" style={{ color: isToday ? colors.text : colors.textSecondary }}>
                 {h.weekLetters[i]}
               </Text>
@@ -397,36 +396,6 @@ function WeekCard({
           );
         })}
       </View>
-
-      {/* Meta da semana: a barra fica menta quando completa. */}
-      <View style={[styles.goal, { borderTopColor: colors.border }]}>
-        <View style={styles.goalHead}>
-          <Text weight="semibold" accessibilityRole="header" style={styles.shrink}>
-            {h.goalTitle}
-          </Text>
-          <Text variant="bodySmall" color={complete ? 'successInk' : 'textSecondary'} style={styles.shrink}>
-            {count}
-          </Text>
-        </View>
-        <ProgressBar value={goal.done / goal.total} accessibilityLabel={complete ? h.goalDone : goalA11y} />
-        {goal.tips && (
-          <Text variant="bodySmall" color="textSecondary" importantForAccessibility="no" accessibilityElementsHidden>
-            {h.goalFreeDetail(goal.sims.done, goal.tips.done)}
-          </Text>
-        )}
-      </View>
-
-      <Pressable
-        onPress={() => router.push('/calendario')}
-        accessibilityRole="link"
-        accessibilityLabel={t.calendar.link}
-        style={({ pressed }) => [styles.calendarLink, { borderTopColor: colors.border }, pressed && { opacity: 0.7 }]}
-      >
-        <Text weight="semibold" color="primaryInk">
-          {t.calendar.link}
-        </Text>
-        <ChevronRight size={20} color={colors.primaryInk} strokeWidth={iconStroke} />
-      </Pressable>
     </Card>
   );
 }
@@ -462,8 +431,19 @@ const styles = StyleSheet.create({
   hello: { gap: 6, paddingBottom: space[2] },
   gap12: { gap: space[3] },
   gap16: { gap: space[4] },
-  eyebrow: { letterSpacing: 0.4 },
-  calendarLink: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, paddingTop: 12, borderTopWidth: 1 },
+  action: { gap: space[5], padding: space[5] },
+  actionText: { gap: space[2] },
+  brandHead: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  brandIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.chip,
+    backgroundColor: brandSurface.iconBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  onBrand: { color: brandSurface.ink },
+  onBrandSoft: { color: brandSurface.inkSoft },
   streakHead: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   streakIcon: { width: 40, height: 40, borderRadius: radius.chip, alignItems: 'center', justifyContent: 'center' },
   week: { flexDirection: 'row', gap: space[1] },
@@ -471,7 +451,6 @@ const styles = StyleSheet.create({
   dot: { width: 28, height: 28, borderRadius: radius.chip, alignItems: 'center', justifyContent: 'center' },
   goalHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space[2] },
   shrink: { flexShrink: 1 },
-  goal: { gap: space[2], paddingTop: space[4], borderTopWidth: 1 },
   trendRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   badge: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: radius.chip },
   link: {

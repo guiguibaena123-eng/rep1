@@ -80,7 +80,7 @@ function Result({ data }: { data: InterviewResult }) {
       >
         <View style={styles.top}>
           <ScoreRing score={report.overall_score} size="lg" showLabel={false} />
-          <Text variant="screenTitle" align="center" accessibilityRole="header" style={{ fontSize: 22, lineHeight: 28 }}>
+          <Text variant="cardTitle" align="center" accessibilityRole="header">
             {report.encouragement}
           </Text>
           {/* Só mostramos quando a nota subiu: comparação negativa desanima (tom do app). */}
@@ -184,7 +184,7 @@ function Result({ data }: { data: InterviewResult }) {
                       {i + 1}
                     </Text>
                   </View>
-                  <Text weight="semibold" style={[styles.flex, { fontSize: 15, lineHeight: 21 }]}>
+                  <Text weight="semibold" style={styles.flex}>
                     {q.text}
                   </Text>
                   <Text style={styles.answerScore}>
